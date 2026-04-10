@@ -38,9 +38,6 @@ st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com
 st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR vs Plan")
 # =================================
 
-st.sidebar.image("images/agco.jpg", width=240)
-st.sidebar.divider()
-
 
 st.title("Comparativo Request Vs Plan")
 st.caption("Comparativo REQUEST − PLAN com filtros e resumos")

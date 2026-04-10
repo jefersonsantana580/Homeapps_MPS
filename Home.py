@@ -98,18 +98,20 @@ st.markdown("---")
 
 
 
-
 st.markdown(
     """
     <style>
     .footer {
         position: fixed;
-        bottom: 10px;
-        right: 20px;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: transparent;
         color: #888;
+        text-align: center;
+        padding: 10px;
         font-size: 0.75rem;
-        z-index: 999;
-        background: transparent;
+        z-index: 100;
     }
     </style>
 
@@ -119,7 +121,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-
-
-

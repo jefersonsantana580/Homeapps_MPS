@@ -16,9 +16,10 @@ st.set_page_config(
 )
 
 
-import streamlit as st
+ol1, col2 = st.columns([8, 2])
 
-col1, col2 = st.columns([8, 2])
+with col1:
+    st.title("Comparação de Ciclo")
 
 with col2:
     with open("arquivos_padrao/comparacao_ciclo_padrao.xlsx", "rb") as file:
@@ -28,6 +29,7 @@ with col2:
             file_name="comparacao_ciclo_padrao.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
 
 # === SIDEBAR (IGUAL AO HOME) ===
 st.markdown(

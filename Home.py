@@ -99,7 +99,7 @@ st.markdown("---")
 
 
 
-t.markdown(
+st.markdown(
     """
     <style>
     .footer {

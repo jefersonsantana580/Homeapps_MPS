@@ -82,7 +82,7 @@ st.markdown(
 st.markdown("---")
 
 
-st.markdown("📊 Comparativo P.Request x Op.Plan"")
+st.markdown("📊 Comparativo P.Request x Op.Plan")
 st.markdown(
     """
     Este app tem como objetivo comparar o P. Request com o Op. Plan identificando e mostrando diferenças por filial,

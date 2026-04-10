@@ -8,17 +8,13 @@ st.set_page_config(
 )
 
 # ESCONDE MENU PADRÃO
-st.markdown(
-    """
+st.markdown(    """
     <style>
         [data-testid="stSidebarNav"] {
-            display: none;
-        }
-    </style>
-    """,
+            display: none;        }
+    </style>    """,
     unsafe_allow_html=True
 )
-
 # SIDEBAR PERSONALIZADA
 st.sidebar.image("images/agco.jpg")
 st.sidebar.divider()

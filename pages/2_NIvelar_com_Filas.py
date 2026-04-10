@@ -11,6 +11,20 @@ import io
 import pandas as pd
 import streamlit as st
 
+
+col1, col2 = st.columns([8, 2])
+
+
+with col2:
+    with open("arquivos_padrao/nivelamento_com_fila_padrao.xlsx", "rb") as file:
+        st.download_button(
+            label="📥 Baixar arquivo padrão",
+            data=file,
+            file_name="nivelamento_com_fila_padrao.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+
 # =====================================================
 # Configuração da página
 # =====================================================

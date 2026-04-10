@@ -26,4 +26,4 @@ st.divider()
 
 st.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas/ Período de forecast")
 st.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento utilizando Filas")
-st.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo Product Request vs Operational Plan")
+st.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo Product Request VS Operational Plan")

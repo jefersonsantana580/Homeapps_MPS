@@ -16,7 +16,7 @@ import streamlit as st
 # =====================================================
 
 st.set_page_config(page_title="Nivelamento de Filas", layout="wide")
-st.title("📊 Nivelamento de Filas – Cenários 1 e 2 (Balanceados)")
+st.title("📊 Nivelamento de Filas – Cenários 1 e 2")
 
 # === SIDEBAR (IGUAL AO HOME) ===
 st.markdown(

@@ -15,6 +15,7 @@ st.set_page_config(
     layout="wide"
 )
 render_sidebar()   # 👈 AQUI
+
 st.title("Comparativo Request Vs Plan")
 st.caption("Comparativo REQUEST − PLAN com filtros e resumos")
 

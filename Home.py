@@ -15,7 +15,11 @@ st.sidebar.divider()
 
 
 st.title("📊 Ferramentas para Otimizaçãoo de trabalho - MPS")
-st.caption("Selecione um aplicativo para começar")
+
+st.markdown(
+    "<p style='font-size:20px; color:#9ca3af;'>Selecione um aplicativo para começar</p>",
+    unsafe_allow_html=True
+)
 
 st.divider()
 

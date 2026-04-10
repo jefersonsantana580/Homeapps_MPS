@@ -1,6 +1,38 @@
 
 import streamlit as st
 
+st.markdown(
+    """
+    <style>
+    .fixed-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #0e1117;
+        padding: 15px 30px;
+        border-bottom: 1px solid #333;
+        z-index: 1000;
+    }
+
+    .fixed-header h1 {
+        margin: 0;
+        font-size: 1.6rem;
+        color: white;
+    }
+
+    /* empurra o conteúdo para baixo do header */
+    .block-container {
+        padding-top: 90px;
+    }
+    </style>
+
+    <div class="fixed-header">
+        <h1>Ferramentas para Otimização de Trabalho – MPS</h1>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.set_page_config(
     page_title="Ferramentas para Otimização de trabalho - MPS",
@@ -37,39 +69,6 @@ st.markdown(
     """
         Selecione um aplicativo no menu à esquerda para começar.
     """
-)
-
-st.markdown(
-    """
-    <style>
-    .fixed-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: #0e1117;
-        padding: 15px 30px;
-        border-bottom: 1px solid #333;
-        z-index: 1000;
-    }
-
-    .fixed-header h1 {
-        margin: 0;
-        font-size: 1.6rem;
-        color: white;
-    }
-
-    /* empurra o conteúdo para baixo do header */
-    .block-container {
-        padding-top: 90px;
-    }
-    </style>
-
-    <div class="fixed-header">
-        <h1>Ferramentas para Otimização de Trabalho – MPS</h1>
-    </div>
-    """,
-    unsafe_allow_html=True
 )
 st.divider()
 

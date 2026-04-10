@@ -57,8 +57,7 @@ st.markdown(
 st.divider()
 
  
-st.subheader("📌 Entenda os aplicativos")
-  
+st.subheader("📌 Entenda os aplicativos")  
 st.markdown("### 📈 Nivelamento sem filas")
 st.markdown(
     """
@@ -66,9 +65,7 @@ st.markdown(
         Este é ideal para usar quando não tivermos filas criadas no JDE e nem as filas fictícias.
     """
 )
-
 st.divider()
-
 st.markdown("### 📉 Nivelamento com filas")
 st.markdown(
     """

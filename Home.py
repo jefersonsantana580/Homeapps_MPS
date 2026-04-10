@@ -94,7 +94,7 @@ st.markdown(
 st.divider()
 
 
-.markdown(
+st.markdown(
     """
     <style>
     .footer {

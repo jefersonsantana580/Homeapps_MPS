@@ -8,7 +8,6 @@ st.set_page_config(
     layout="wide"
 )
 
-
 st.markdown(
     """
     <style>
@@ -66,7 +65,7 @@ st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR v
 st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 
 
-st.title("Ferramentas para Otimização de Trabalho – MPS")
+# st.title("Ferramentas para Otimização de Trabalho – MPS")
 
 st.markdown(
     """

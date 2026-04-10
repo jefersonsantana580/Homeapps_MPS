@@ -16,6 +16,20 @@ st.set_page_config(
 )
 
 
+ol1, col2 = st.columns([8, 2])
+
+with col1:
+    st.title("Comparação de Ciclo")
+
+with col2:
+    with open("arquivos_padrao/comparacao_ciclo_padrao.xlsx", "rb") as file:
+        st.download_button(
+            label="📥 Baixar arquivo padrão",
+            data=file,
+            file_name="comparacao_ciclo_padrao.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
 
 
 with col2:

@@ -18,6 +18,28 @@ import streamlit as st
 st.set_page_config(page_title="Nivelamento de Filas", layout="wide")
 st.title("📊 Nivelamento de Filas – Cenários 1 e 2 (Balanceados)")
 
+# === SIDEBAR (IGUAL AO HOME) ===
+st.markdown(
+    """
+    <style>
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.sidebar.image("images/agco.jpg", width=240)
+st.sidebar.divider()
+
+st.sidebar.markdown("### 📊 Aplicações")
+st.sidebar.page_link("Home.py", label="🏠 Home")
+st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas")
+st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com Filas")
+st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR vs Plan")
+# =================================
+
 # =====================================================
 # Sidebar – Parâmetros
 # =====================================================

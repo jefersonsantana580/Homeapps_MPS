@@ -8,15 +8,16 @@ st.set_page_config(
 )
 
 
+
 st.markdown(
     """
     <style>
-    /* HEADER FIXO */
+    /* HEADER FIXO APENAS NA ÁREA PRINCIPAL */
     .fixed-header {
         position: fixed;
         top: 0;
-        left: 0;
-        width: 100%;
+        left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
         background-color: #0e1117;
         padding: 15px 30px;
         border-bottom: 1px solid #333;
@@ -29,7 +30,12 @@ st.markdown(
         color: white;
     }
 
-    /* EMPURRA TODO O CONTEÚDO PARA BAIXO (CORREÇÃO REAL) */
+    /* Define largura padrão da sidebar */
+    :root {
+        --sidebar-width: 21rem;
+    }
+
+    /* Empurra o conteúdo para baixo do header */
     div[data-testid="stAppViewContainer"] {
         padding-top: 90px;
     }
@@ -41,6 +47,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 

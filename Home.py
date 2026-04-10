@@ -10,11 +10,6 @@ st.set_page_config(
 # IMAGEM NA SIDEBAR
 st.logo("images/agco.jpg", size="large")
 
-st.sidebar.markdown(
-    "<small><strong>MPS – Planejamento</strong><br>"
-    "Ferramentas Analíticas</small>",
-    unsafe_allow_html=True
-)
 
 st.sidebar.divider()
 

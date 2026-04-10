@@ -31,9 +31,6 @@ with col2:
         )
 
 
-
-
-
 # === SIDEBAR (IGUAL AO HOME) ===
 st.markdown(
     """
@@ -53,11 +50,11 @@ st.sidebar.markdown("### 📊 Aplicações")
 st.sidebar.page_link("Home.py", label="🏠 Home")
 st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas")
 st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com Filas")
-st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo P.Request VS O.plan")
+st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo P.Request VS Op.plan")
 # =================================
 st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 
-st.title("Comparativo P.Request Vs O.Plan")
+st.title("Comparativo P.Request Vs Op.Plan")
 st.caption("Fltros e Resumos")
 
 PT_BR_MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"]

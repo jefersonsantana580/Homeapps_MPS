@@ -15,7 +15,6 @@ st.set_page_config(
     layout="wide"
 )
 
-
 # === SIDEBAR (IGUAL AO HOME) ===
 st.markdown(
     """
@@ -37,7 +36,7 @@ st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas
 st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com Filas")
 st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR vs Plan")
 # =================================
-
+st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 
 st.title("Comparativo Request Vs Plan")
 st.caption("Comparativo REQUEST − PLAN com filtros e resumos")

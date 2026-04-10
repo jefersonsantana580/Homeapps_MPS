@@ -8,6 +8,37 @@ st.set_page_config(
     layout="wide"
 )
 
+# ESCONDE MENU PADRÃO
+st.markdown(    """
+    <style>
+        [data-testid="stSidebarNav"] {
+            display: none;        }
+    </style>    """,
+    unsafe_allow_html=True
+)
+
+# SIDEBAR PERSONALIZADA
+st.sidebar.image("images/agco.jpg")
+st.sidebar.divider()
+
+st.sidebar.markdown("### 📊 Aplicações")
+
+st.sidebar.page_link("Home.py", label="🏠 Home")
+st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas")
+st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com Filas")
+st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR vs Plan")
+
+st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
+
+
+st.title("Ferramentas para Otimização de Trabalho – MPS")
+
+st.markdown(
+    """
+        Selecione um aplicativo no menu à esquerda para começar.
+    """
+)
+
 st.markdown(
     """
     <style>
@@ -40,39 +71,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-
-# ESCONDE MENU PADRÃO
-st.markdown(    """
-    <style>
-        [data-testid="stSidebarNav"] {
-            display: none;        }
-    </style>    """,
-    unsafe_allow_html=True
-)
-
-# SIDEBAR PERSONALIZADA
-st.sidebar.image("images/agco.jpg")
-st.sidebar.divider()
-
-st.sidebar.markdown("### 📊 Aplicações")
-
-st.sidebar.page_link("Home.py", label="🏠 Home")
-st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas")
-st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com Filas")
-st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR vs Plan")
-
-st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
-
-
-st.title("Ferramentas para Otimização de Trabalho – MPS")
-
-st.markdown(
-    """
-        Selecione um aplicativo no menu à esquerda para começar.
-    """
-)
-
 st.divider()
 
 # ===== COMO USAR =====

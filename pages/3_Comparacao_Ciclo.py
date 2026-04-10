@@ -38,8 +38,8 @@ st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo P.Re
 # =================================
 st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 
-st.title("Comparativo Request Vs Plan")
-st.caption("Comparativo REQUEST − PLAN com filtros e resumos")
+st.title("Comparativo P.Request Vs O.Plan")
+st.caption("Fltros e Resumos")
 
 PT_BR_MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"]
 

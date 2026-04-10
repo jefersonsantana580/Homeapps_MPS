@@ -45,6 +45,21 @@ st.markdown(
 
 st.divider()
 
+# ===== COMO USAR =====
+st.subheader("💡 Como usar")
+
+st.markdown(
+    """
+    1. Selecione o aplicativo desejado no menu à esquerda  
+    2. Baixe o **arquivo padrão** disponível no topo do aplicativo.
+    3. Preencha o arquivo com seus dados  
+    4. Faça o upload e analise os resultados gerados
+    """
+)
+
+st.divider()
+
+
 # ===== CARDS DOS APPS =====
 col1, col2, col3 = st.columns(3)
 
@@ -77,20 +92,6 @@ with col3:
         """
     )
     
-st.divider()
-
-# ===== COMO USAR =====
-st.subheader("💡 Como usar")
-
-st.markdown(
-    """
-    1. Selecione o aplicativo desejado no menu à esquerda  
-    2. Baixe o **arquivo padrão** disponível no topo do aplicativo.
-    3. Preencha o arquivo com seus dados  
-    4. Faça o upload e analise os resultados gerados
-    """
-)
-
 st.divider()
 
 

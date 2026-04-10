@@ -23,7 +23,8 @@ st.markdown(
 
 st.divider()
 
-st.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas/ Período de forecast")
-st.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelar utliziando Filas")
-st.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparação PR vs Plan")
+st.subheader("🔗 Aplicações")
 
+st.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas / Período de forecast")
+st.page_link("pages/2_Ajuste_Filas.py", label="🛠 Nivelar utilizando Filas")
+st.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparação PR vs Plan")

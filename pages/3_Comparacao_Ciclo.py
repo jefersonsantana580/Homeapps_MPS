@@ -4,7 +4,7 @@ import re
 import datetime as dt
 import pandas as pd
 import streamlit as st
-from sidebar import render_sidebar
+
 
 # =====================================================
 # CONFIGURAÇÃO DA PÁGINA
@@ -14,7 +14,7 @@ st.set_page_config(
     page_title="Comparativo Request Vs Plan",
     layout="wide"
 )
-render_sidebar()   # 👈 AQUI
+
 
 st.title("Comparativo Request Vs Plan")
 st.caption("Comparativo REQUEST − PLAN com filtros e resumos")

@@ -1,6 +1,11 @@
 
 import streamlit as st
 
+st.set_page_config(
+    page_title="Ferramentas para Otimização de trabalho - MPS",
+    page_icon="📊",
+    layout="wide"
+)
 st.markdown(
     """
     <style>
@@ -34,11 +39,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.set_page_config(
-    page_title="Ferramentas para Otimização de trabalho - MPS",
-    page_icon="📊",
-    layout="wide"
-)
+
 
 # ESCONDE MENU PADRÃO
 st.markdown(    """

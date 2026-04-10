@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 
-ol1, col2 = st.columns([8, 2])
+col1, col2 = st.columns([8, 2])
 
 with col1:
     st.title("Comparação de Ciclo")

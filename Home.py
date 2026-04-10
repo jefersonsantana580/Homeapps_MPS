@@ -9,7 +9,7 @@ st.set_page_config(
 
 # IMAGEM NA SIDEBAR
 st.sidebar.image(
-    "images/logo.png",
+    "images/agco.png",
     use_column_width=True
 )
 

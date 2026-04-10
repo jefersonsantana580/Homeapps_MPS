@@ -15,6 +15,7 @@ st.set_page_config(
     layout="wide"
 )
 
+
 # === SIDEBAR (IGUAL AO HOME) ===
 st.markdown(
     """
@@ -26,6 +27,16 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+st.sidebar.image("images/agco.jpg", width=240)
+st.sidebar.divider()
+
+st.sidebar.markdown("### 📊 Aplicações")
+st.sidebar.page_link("Home.py", label="🏠 Home")
+st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas")
+st.sidebar.page_link("pages/2_Ajuste_Filas.py", label="🛠 Nivelamento com Filas")
+st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR vs Plan")
+# =================================
 
 st.sidebar.image("images/agco.jpg", width=240)
 st.sidebar.divider()

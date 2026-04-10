@@ -28,6 +28,7 @@ st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas
 st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com Filas")
 st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR vs Plan")
 
+st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 # CONTEÚDO PRINCIPAL
 st.title("📊 Ferramentas para Otimização de trabalho - MPS")
 st.markdown(

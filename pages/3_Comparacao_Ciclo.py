@@ -18,6 +18,7 @@ st.set_page_config(
 
 import streamlit as st
 
+
 col1, col2 = st.columns([8, 2])
 
 with col2:

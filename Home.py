@@ -92,8 +92,6 @@ with col3:
         """
     )
     
-st.divider()
-
 
 st.markdown(
     """

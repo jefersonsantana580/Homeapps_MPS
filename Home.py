@@ -97,20 +97,19 @@ st.markdown(
 st.markdown("---")
 
 
-st.markdown(
+
+
+t.markdown(
     """
     <style>
     .footer {
         position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: transparent;
+        bottom: 10px;
+        right: 20px;
         color: #888;
-        text-align: center;
-        padding: 10px;
         font-size: 0.75rem;
-        z-index: 100;
+        z-index: 999;
+        background: transparent;
     }
     </style>
 

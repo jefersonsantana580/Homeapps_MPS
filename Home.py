@@ -32,7 +32,7 @@ st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 # CONTEÚDO PRINCIPAL
 st.title("📊 Ferramentas para Otimização de trabalho - MPS")
 st.markdown(
-    "<p style='font-size:18px; color:#9ca3af;'>Selecione um aplicativo para começar</p>",
+    "<p style='font-size:18px; color:#9ca3af;'>Selecione um aplicativo no menu a esquerda para começar</p>",
     unsafe_allow_html=True
 )
 st.divider()

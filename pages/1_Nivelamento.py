@@ -640,7 +640,7 @@ if gerar:
         st.error(f"Erro ao processar: {e}")
         st.exception(e)
 
-st.markdown("---")
+
 
 
 st.markdown(

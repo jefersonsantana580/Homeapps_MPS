@@ -6,9 +6,24 @@ st.set_page_config(
     layout="wide"
 )
 
+st.markdown(
+    """
+    <style>
+        section[data-testid="stSidebar"] img {
+            width: 220px !important;
+            margin: 0 auto;
+            display: block;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # IMAGEM NA SIDEBAR
-st.logo("images/agco.jpg", size="large")
+st.sidebar.image("images/agco.jpg")
 
 
 st.sidebar.divider()

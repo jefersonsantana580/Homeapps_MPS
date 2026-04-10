@@ -14,7 +14,7 @@ st.logo("images/agco.jpg", size="large")
 st.sidebar.divider()
 
 
-st.title("📊 Ferramentas para Otimizaçãoo de trabalho - MPS")
+st.title("📊 Ferramentas para Otimização de trabalho - MPS")
 
 st.markdown(
     "<p style='font-size:20px; color:#9ca3af;'>Selecione um aplicativo para começar</p>",

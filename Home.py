@@ -23,7 +23,7 @@ st.markdown(
 
 
 # IMAGEM NA SIDEBAR
-st.sidebar.image("images/agco.jpg")
+st.sidebar.image("images/agco.jpg", width=240)
 
 
 st.sidebar.divider()

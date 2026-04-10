@@ -13,6 +13,18 @@ from dateutil.relativedelta import relativedelta
 import pandas as pd
 import streamlit as st
 
+col1, col2 = st.columns([8, 2])
+
+
+with col2:
+    with open("arquivos_padrao/nivelamento_sem_fila_padrao.xlsx", "rb") as file:
+        st.download_button(
+            label="📥 Baixar arquivo padrão",
+            data=file,
+            file_name="nivelamento_sem_fila_padrao.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
 # =========================
 # Config e UI
 # =========================

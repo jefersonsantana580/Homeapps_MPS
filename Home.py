@@ -116,22 +116,24 @@ st.markdown("---")
 st.markdown(
     """
     <style>
-    .footer {
+    .floating-footer {
         position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: transparent;
-        color: #888;
-        text-align: center;
-        padding: 10px;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(14, 17, 23, 0.9);
+        color: #ccc;
+        padding: 8px 16px;
+        border-radius: 8px;
         font-size: 0.75rem;
-        z-index: 100;
+        z-index: 999;
+        border: 1px solid #333;
+        backdrop-filter: blur(4px);
     }
     </style>
 
-    <div class="footer">
-        Aplicação desenvolvida para suporte às análises do time MPS • Versão 1.0 - By Jeferson Santana - Copilot
+    <div class="floating-footer">
+        Aplicação desenvolvida para suporte às análises do time MPS • Versão 1.0 - Jeferson Santana/Copilot
     </div>
     """,
     unsafe_allow_html=True

@@ -7,6 +7,7 @@ st.set_page_config(
     layout="wide"
 )
 
+
 st.markdown(
     """
     <style>
@@ -28,8 +29,8 @@ st.markdown(
         color: white;
     }
 
-    /* EMPURRA TODO O CONTEÚDO PARA BAIXO DO HEADER */
-    section.main > div:first-child {
+    /* EMPURRA TODO O CONTEÚDO PARA BAIXO (CORREÇÃO REAL) */
+    div[data-testid="stAppViewContainer"] {
         padding-top: 90px;
     }
     </style>
@@ -40,6 +41,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 # ESCONDE MENU PADRÃO

@@ -235,3 +235,26 @@ if uploaded and st.button("🚀 Gerar Nivelamento"):
         file_name='nivelamento_final_opcaoB.xlsx',
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+st.markdown(
+    """
+    <style>
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: transparent;
+        color: #888;
+        text-align: center;
+        padding: 10px;
+        font-size: 0.75rem;
+        z-index: 100;
+    }
+    </style>
+
+    <div class="footer">
+        Aplicação desenvolvida para suporte às análises do time MPS • Versão 1.0 - By Jeferson Santana - Copilot
+    </div>
+    """,
+    unsafe_allow_html=True
+)

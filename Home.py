@@ -20,7 +20,7 @@ st.markdown(
 )
 
 # SIDEBAR PERSONALIZADA
-st.sidebar.image("images/agco.jpg", width=240)
+st.sidebar.image("images/agco.jpg")
 st.sidebar.divider()
 
 st.sidebar.markdown("### 📊 Aplicações")

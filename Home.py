@@ -113,7 +113,7 @@ st.markdown(
     </style>
 
     <div class="footer">
-        Aplicação desenvolvida para suporte às análises do time MPS • Versão 1.0
+        Aplicação desenvolvida para suporte às análises do time MPS • Versão 1.0 - By Jeferson Santana - Copilot
     </div>
     """,
     unsafe_allow_html=True

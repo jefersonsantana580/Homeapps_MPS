@@ -15,6 +15,21 @@ st.set_page_config(
     layout="wide"
 )
 
+# === SIDEBAR (IGUAL AO HOME) ===
+st.markdown(
+    """
+    <style>
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.sidebar.image("images/agco.jpg", width=240)
+st.sidebar.divider()
+
 
 st.title("Comparativo Request Vs Plan")
 st.caption("Comparativo REQUEST − PLAN com filtros e resumos")

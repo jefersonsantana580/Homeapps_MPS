@@ -8,7 +8,7 @@ st.set_page_config(
 
 
 # IMAGEM NA SIDEBAR
-st.logo("images/agco.jpg")
+st.logo("images/agco.jpg", size="large")
 
 st.title("📊 Ferramentas para Otimizaçãoo de trabalho - MPS")
 st.caption("Selecione um aplicativo para começar")

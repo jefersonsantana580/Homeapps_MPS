@@ -6,6 +6,13 @@ st.set_page_config(
     layout="wide"
 )
 
+
+# IMAGEM NA SIDEBAR
+st.sidebar.image(
+    "images/logo.png",
+    use_column_width=True
+)
+
 st.title("📊 Ferramentas para Otimizaçãoo de trabalho - MPS")
 st.caption("Selecione um aplicativo para começar")
 

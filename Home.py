@@ -3,7 +3,7 @@ import streamlit as st
 st.set_page_config(
     page_title="Central de Apps Streamlit",
     page_icon="📊",
-    layout="WIDE"
+    layout="wide"
 )
 
 st.title("📊 Ferramentas para Otimizaçãoo de trabalho - MPS")

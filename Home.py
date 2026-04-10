@@ -1,10 +1,14 @@
 
 import streamlit as st
+from sidebar import render_sidebar
 
 st.set_page_config(
     page_title="Ferramentas para Otimização de trabalho - MPS",
     page_icon="📊",
-    layout="wide")
+    layout="wide"
+)
+render_sidebar()  # ✅ sidebar fixa
+
 # ESCONDE MENU PADRÃO
 st.markdown(    """
     <style>

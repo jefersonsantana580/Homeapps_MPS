@@ -8,42 +8,19 @@ st.set_page_config(
 )
 
 
-
 st.markdown(
     """
     <style>
-    /* HEADER FIXO APENAS NA ÁREA PRINCIPAL */
-    .fixed-header {
-        position: fixed;
+    /* Torna o título sticky no topo do conteúdo */
+    div[data-testid="stMarkdownContainer"] > h1 {
+        position: sticky;
         top: 0;
-        left: var(--sidebar-width);
-        width: calc(100% - var(--sidebar-width));
         background-color: #0e1117;
-        padding: 15px 30px;
+        padding: 10px 0;
+        z-index: 50;
         border-bottom: 1px solid #333;
-        z-index: 1000;
-    }
-
-    .fixed-header h1 {
-        margin: 0;
-        font-size: 1.6rem;
-        color: white;
-    }
-
-    /* Define largura padrão da sidebar */
-    :root {
-        --sidebar-width: 21rem;
-    }
-
-    /* Empurra o conteúdo para baixo do header */
-    div[data-testid="stAppViewContainer"] {
-        padding-top: 90px;
     }
     </style>
-
-    <div class="fixed-header">
-        <h1>Ferramentas para Otimização de Trabalho – MPS</h1>
-    </div>
     """,
     unsafe_allow_html=True
 )
@@ -74,7 +51,7 @@ st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR v
 st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 
 
-#st.title("Ferramentas para Otimização de Trabalho – MPS")
+st.title("Ferramentas para Otimização de Trabalho – MPS")
 
 st.markdown(
     """

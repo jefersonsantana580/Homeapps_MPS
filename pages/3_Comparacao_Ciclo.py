@@ -16,10 +16,7 @@ st.set_page_config(
 )
 
 
-col1, col2 = st.columns([8, 2])
 
-with col1:
-    st.title("Comparação de Ciclo")
 
 with col2:
     with open("arquivos_padrao/comparacao_ciclo_padrao.xlsx", "rb") as file:

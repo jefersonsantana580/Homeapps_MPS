@@ -5,10 +5,12 @@ st.set_page_config(
     page_title="Ferramentas para Otimização de trabalho - MPS",
     page_icon="📊",
     layout="wide"
-)
+
+
 st.markdown(
     """
     <style>
+    /* HEADER FIXO */
     .fixed-header {
         position: fixed;
         top: 0;
@@ -26,8 +28,8 @@ st.markdown(
         color: white;
     }
 
-    /* empurra o conteúdo para baixo do header */
-    .block-container {
+    /* EMPURRA TODO O CONTEÚDO PARA BAIXO DO HEADER */
+    section.main > div:first-child {
         padding-top: 90px;
     }
     </style>
@@ -38,7 +40,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
 
 
 # ESCONDE MENU PADRÃO
@@ -64,7 +65,7 @@ st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR v
 st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 
 
-st.title("Ferramentas para Otimização de Trabalho – MPS")
+#st.title("Ferramentas para Otimização de Trabalho – MPS")
 
 st.markdown(
     """

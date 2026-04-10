@@ -23,7 +23,6 @@ st.markdown(
 
 st.divider()
 
-st.subheader("🔗 Aplicações")
 
 st.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas / Período de forecast")
 st.page_link("pages/2_Ajuste_Filas.py", label="🛠 Nivelar utilizando Filas")

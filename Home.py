@@ -57,7 +57,6 @@ st.markdown(
 st.divider()
 
  
-st.divider()
 st.subheader("📌 Entenda os aplicativos")
   
 st.markdown("### 📈 Nivelamento sem filas")
@@ -68,6 +67,7 @@ st.markdown(
     """
 )
 
+st.divider()
 
 st.markdown("### 📉 Nivelamento com filas")
 st.markdown(

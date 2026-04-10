@@ -8,6 +8,14 @@ import streamlit as st
 # =====================================================
 # CONFIGURAÇÃO DA PÁGINA
 # =====================================================
+
+import streamlit as st
+from sidebar import render_sidebar
+
+st.set_page_config(layout="wide")
+
+render_sidebar()  # ✅ mesma sidebar
+
 st.set_page_config(
     page_title="Comparativo Request Vs Plan",
     layout="wide"

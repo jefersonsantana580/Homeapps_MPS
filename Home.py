@@ -5,7 +5,7 @@ st.set_page_config(
     page_title="Ferramentas para Otimização de trabalho - MPS",
     page_icon="📊",
     layout="wide"
-
+)
 
 st.markdown(
     """

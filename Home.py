@@ -73,16 +73,18 @@ st.markdown("### 📉 Nivelamento com filas")
 st.markdown(
     """
      Realiza o nivelamento diário do volume considerando as filas existentes e sugere duas datas possíveis para ajuste:
-        Cenário 1: Faz o nivelamento considerando como principal objetivo a antecipação mínima de datas.
-        Cenário 2: Faz o nivelamento considerando como principal objetivo o nivelamento por modelos.
-        Este App é ideal para um cenário onde já temos filas criadas e temos alguns dias com slots vazios.
+     
+     - Cenário 1: Faz o nivelamento considerando como principal objetivo a antecipação mínima de datas.
+     - Cenário 2: Faz o nivelamento considerando como principal objetivo o nivelamento por modelos.
+    
+     Este App é ideal para um cenário onde já temos filas criadas e temos alguns dias com slots vazios.
     """
 )
 
 st.markdown("---")
 
 
-st.markdown("###📊 Comparativo P.Request x Op.Plan")
+st.markdown("### 📊 Comparativo P.Request x Op.Plan")
 st.markdown(
     """
     Este app tem como objetivo comparar o P. Request com o Op. Plan identificando e mostrando diferenças por filial,

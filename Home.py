@@ -36,10 +36,7 @@ st.title("Ferramentas para Otimização de Trabalho – MPS")
 
 st.markdown(
     """
-    Conjunto de aplicações para suporte ao planejamento, nivelamento de carga
-    e análise de aderência entre planejamento e execução.
-
-    Selecione um aplicativo no menu à esquerda para começar.
+        Selecione um aplicativo no menu à esquerda para começar.
     """
 )
 
@@ -91,7 +88,42 @@ with col3:
         produto, mercado etc de forma rápida e com um visual claro.
         """
     )
-    
+ 
+st.divider()
+st.subheader("📌 Entenda os aplicativos")
+  
+st.markdown("### 📈 Nivelamento sem filas")
+st.markdown(
+    """
+    Explicação do app.
+    Aqui pode ser texto longo.
+    Quantas linhas quiser.
+    """
+)
+
+
+st.markdown("### 📉 Nivelamento com filas")
+st.markdown(
+    """
+    Explicação do app.
+    Aqui fica logo ABAIXO do anterior.
+    """
+)
+
+st.markdown("---")
+
+
+st.markdown("### 📊 Comparativo PV x Plan")
+st.markdown(
+    """
+    Explicação do app.
+    """
+)
+
+
+
+st.markdown("---")
+
 
 st.markdown(
     """

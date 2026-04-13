@@ -102,8 +102,8 @@ st.markdown("---")
 st.markdown("### 📊 Comparativo P.Request x Op.Plan")
 st.markdown(
     """
-    Este app tem como objetivo comparar o P. Request com o Op. Plan identificando e mostrando diferenças por filial,
-        produto, mercado etc de forma rápida e com um visual claro.
+    Este app tem como objetivo comparar o P. Request com o Op. Plan identificando e trazendo as diferenças por filial,
+     produto, mercado etc de forma rápida com um visual claro e simples.
     """
 )
 

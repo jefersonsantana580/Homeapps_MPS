@@ -80,7 +80,7 @@ st.markdown("### 📈 Nivelamento sem filas")
 st.markdown(
     """
      Realiza o nivelamento diário do volume e faz a criação de filas considerando os parâmetros inseridos no menu do app. 
-        Este é ideal para usar quando não tivermos filas criadas no JDE e nem as filas fictícias.
+        Este é ideal para usar no período que não tiver filas criadas no JDE e nem as filas fictícias.
     """
 )
 st.divider()
@@ -92,7 +92,7 @@ st.markdown(
      - Cenário 1: Faz o nivelamento considerando como principal objetivo a antecipação mínima de datas.
      - Cenário 2: Faz o nivelamento considerando como principal objetivo o nivelamento por modelos.
     
-     Este App é ideal para um cenário onde já temos filas criadas e temos alguns dias com slots vazios.
+     Este App é ideal para usar em um cenário onde já tem filas criadas e contém alguns dias com slots vazios.
     """
 )
 

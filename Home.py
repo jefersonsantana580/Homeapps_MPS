@@ -90,13 +90,13 @@ st.markdown(
     Realiza o nivelamento diário do volume considerando as filas existentes e sugere três possibilidades de ajuste, respeitando a capacidade diária informada.
 
 
-Cenário 1: prioriza a antecipação mínima das datas, buscando manter as filas o mais próximo possível da data planejada, com respeito ao limite diário.
+    Cenário 1: prioriza a antecipação mínima das datas, buscando manter as filas o mais próximo possível da data planejada, com respeito ao limite diário.
 
 
-Cenário 2: prioriza o balanceamento diário por modelo, distribuindo o volume de forma mais uniforme entre os dias úteis do mês.
+    Cenário 2: prioriza o balanceamento diário por modelo, distribuindo o volume de forma mais uniforme entre os dias úteis do mês.
 
 
-Cenário 3: aplica um balanceamento híbrido: para modelos com menor volume no mês, tenta manter as filas próximas da data planejada, espalhando apenas quando necessário; para os demais modelos, segue a lógica de nivelamento diário.
+    Cenário 3: aplica um balanceamento híbrido: para modelos com menor volume no mês, tenta manter as filas próximas da data planejada, espalhando apenas quando necessário; para os demais modelos, segue a lógica de nivelamento diário.
 
 
 Este app é ideal para cenários em que já existem filas criadas e é necessário redistribuir o volume diário com melhor equilíbrio e menor impacto nas datas originais.

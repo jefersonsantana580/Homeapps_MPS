@@ -97,6 +97,31 @@ def dias_uteis_mes(datas, feriados):
     ]
     return dias
 
+def ajustar_para_dia_util(data, dias):
+    """
+    Se a data cair em feriado/fim de semana (ou fora da lista de dias úteis),
+    ajusta para o próximo dia útil disponível.
+    Se não existir próximo, usa o último anterior.
+    """
+    if pd.isna(data) or not dias:
+        return pd.NaT
+
+    data = pd.to_datetime(data).normalize()
+    dias = sorted(pd.to_datetime(d).normalize() for d in dias)
+
+    if data in dias:
+        return data
+
+    futuros = [d for d in dias if d >= data]
+    if futuros:
+        return futuros[0]
+
+    anteriores = [d for d in dias if d <= data]
+    if anteriores:
+        return anteriores[-1]
+
+    return pd.NaT
+
 
 def encontrar_coluna_mes(df):
     """
@@ -230,7 +255,6 @@ def balancear_dia_por_modelo(df_pend, capacidade_dia):
 # =====================================================
 
 
-
 def aplicar_cenario1(df_mes, dias, capacidade):
     """
     Cenário 1:
@@ -252,7 +276,6 @@ def aplicar_cenario1(df_mes, dias, capacidade):
         lambda x: ajustar_para_dia_util(x, dias)
     )
 
-    # Filas por modelo em FIFO
     filas_modelo = {}
     for modelo, grupo in df_trab.groupby("MODELO"):
         filas = grupo.sort_values(["DATA_REFERENCIA_C1", "NR_FILA"]).copy()

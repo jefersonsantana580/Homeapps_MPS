@@ -96,8 +96,8 @@ st.markdown(
     Cenário 2: prioriza o balanceamento diário por modelo, distribuindo o volume de forma mais uniforme entre os dias úteis do mês.
 
 
-    Cenário 3: aplica um balanceamento híbrido: para modelos com menor volume no mês, tenta manter as filas próximas da data planejada, espalhando apenas quando necessário; para os demais modelos, segue a lógica de nivelamento diário.
-
+    Cenário 3: aplica um balanceamento híbrido: para modelos com menor volume no mês, tenta manter as filas próximas da data planejada, espalhando apenas quando necessário; 
+                para os demais modelos, segue a lógica de nivelamento diário.
 
 Este app é ideal para cenários em que já existem filas criadas e é necessário redistribuir o volume diário com melhor equilíbrio e menor impacto nas datas originais.
     

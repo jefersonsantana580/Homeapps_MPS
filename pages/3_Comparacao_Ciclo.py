@@ -6,6 +6,17 @@ import datetime as dt
 import pandas as pd
 import streamlit as st
 
+col1, col2 = st.columns([8, 2])
+
+
+with col2:
+    with open("arquivos_padrao/comparacao_ciclo_padrao.xlsx", "rb") as file:
+        st.download_button(
+            label="📥 Baixar arquivo padrão",
+            data=file,
+            file_name="comparacao_ciclo_padrao.xlsx.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 # =====================================================
 # CONFIGURAÇÃO DA PÁGINA
 # =====================================================

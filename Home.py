@@ -107,10 +107,10 @@ Este app é ideal para cenários em que já existem filas criadas e é necessár
 st.markdown("---")
 
 
-st.markdown("### 📊 Comparativo P.Request x Op.Plan")
+st.markdown("### 📊 Comparativo de volumes do ciclo Demand Reviwe")
 st.markdown(
     """
-    Este app tem como objetivo comparar o P. Request com o Op. Plan identificando e trazendo as diferenças por filial,
+    Este app tem como objetivo comparar o P.Request Vs Op.Plan e também F.Response Vs P.Request identificando e trazendo as diferenças por filial,
      produto, mercado etc de forma rápida com um visual claro e simples.
     """
 )

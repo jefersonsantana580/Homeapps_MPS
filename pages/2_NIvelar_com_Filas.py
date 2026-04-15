@@ -828,11 +828,6 @@ if "df_resultado" in st.session_state:
     )
 
 
-    except Exception as e:
-        st.error(f"Erro ao processar: {e}")
-        st.exception(e)
-
-
 st.markdown(
     """
     <style>

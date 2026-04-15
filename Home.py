@@ -46,7 +46,7 @@ st.sidebar.markdown("### 📊 Aplicações")
 st.sidebar.page_link("Home.py", label="🏠 Home")
 st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas")
 st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com Filas")
-st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo PR vs Plan")
+st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo ciclo Demand Review")
 
 st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 
@@ -107,7 +107,7 @@ Este app é ideal para cenários em que já existem filas criadas e é necessár
 st.markdown("---")
 
 
-st.markdown("### 📊 Comparativo de volumes do ciclo Demand Reviwe")
+st.markdown("### 📊 Comparativo de volumes do ciclo Demand Review")
 st.markdown(
     """
     Este app tem como objetivo comparar o P.Request Vs Op.Plan e também F.Response Vs P.Request identificando e trazendo as diferenças por filial,

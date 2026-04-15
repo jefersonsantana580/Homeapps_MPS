@@ -50,7 +50,7 @@ st.sidebar.markdown("### 📊 Aplicações")
 st.sidebar.page_link("Home.py", label="🏠 Home")
 st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas")
 st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com Filas")
-st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo P.Request VS Op.plan")
+st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo ciclo Demand Review")
 # =================================
 st.sidebar.divider()  # 👈 SEPARAÇÃO CLARA
 

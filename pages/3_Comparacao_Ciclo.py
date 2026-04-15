@@ -44,11 +44,11 @@ st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo cicl
 # CONFIGURAÇÃO DA PÁGINA
 # =====================================================
 st.set_page_config(
-    page_title="Comparativo Request Vs Plan",
+    page_title="Comparativo ciclo Demand Review",
     layout="wide"
 )
 
-st.title("Comparativo Request Vs Plan")
+st.title("Comparativo ciclo Demand Review")
 st.caption("Comparativo entre cenários com filtros, resumos e exportação")
 
 PT_BR_MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]

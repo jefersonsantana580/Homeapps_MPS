@@ -646,22 +646,28 @@ if gerar:
 st.markdown(
     """
     <style>
-    .footer {
+    :root {
+        --sidebar-width: 21rem;
+    }
+
+    .footer-bar {
         position: fixed;
-        left: 0;
         bottom: 0;
-        width: 100%;
-        background-color: transparent;
-        color: #888;
-        text-align: center;
-        padding: 10px;
+        left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+        background-color: rgba(14, 17, 23, 0.95);
+        color: #ccc;
         font-size: 0.75rem;
-        z-index: 100;
+        text-align: center;
+        padding: 8px 0;
+        z-index: 999;
+        border-top: 1px solid #333;
+        backdrop-filter: blur(4px);
     }
     </style>
 
-    <div class="footer">
-        Aplicação desenvolvida para suporte às análises do time MPS • Versão 1.0 - By Jeferson Santana - Copilot
+    <div class="footer-bar">
+        Aplicação desenvolvida para suporte às análises do time MPS • Versão 1.0 — Jeferson Santana / Copilot
     </div>
     """,
     unsafe_allow_html=True

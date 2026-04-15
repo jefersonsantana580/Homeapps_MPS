@@ -11,7 +11,7 @@ import streamlit as st
 # =====================================================
 
 st.set_page_config(
-    page_title="Comparativo P.Request Vs Op.Plan",
+    page_title="Comparativo ciclo Demand Review",
     layout="wide"
 )
 

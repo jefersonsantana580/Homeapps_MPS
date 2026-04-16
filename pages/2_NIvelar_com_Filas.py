@@ -116,21 +116,25 @@ def parse_feriados(text):
     return out
 
 
+
 def dias_uteis_mes(datas, feriados):
     datas_validas = pd.to_datetime(datas, errors="coerce").dropna()
     if datas_validas.empty:
         return []
 
+    # ✅ Primeiro e último dia do MÊS, e não da última data planejada
     first = datas_validas.min().replace(day=1)
-    last = datas_validas.max()
+    last = first + pd.offsets.MonthEnd(1)
 
     dias = pd.date_range(first, last, freq="D")
+
     dias = [
         d.normalize()
         for d in dias
         if d.weekday() < 5 and d.normalize() not in feriados
     ]
     return dias
+
 
 
 def ajustar_para_dia_util(data, dias):

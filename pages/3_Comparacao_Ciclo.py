@@ -520,7 +520,6 @@ def gerar_passo1(xlsx_bytes, show_debug=False, visao="Request - Plan", incluir_o
         "PRODUCT NEED",
         "PRODUCT SERIES",
         "PRODUCT BRAND",
-        "PRODUCT MARKET",
     ]
 
     base_df = garantir_colunas(base_df, grp_serie + meses, 0)

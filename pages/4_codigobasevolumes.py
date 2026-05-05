@@ -17,6 +17,28 @@ st.set_page_config(
 
 st.title("📊 Histórico de volume nas revisões DR")
 
+# === SIDEBAR (IGUAL AO HOME) ===
+st.markdown(
+    """
+    <style>
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.sidebar.image("images/agco.jpg", width=240)
+st.sidebar.divider()
+
+st.sidebar.page_link("Home.py", label="🏠 Home")
+st.sidebar.page_link("pages/1_Nivelamento.py", label="📈1- Nivelamento sem filas")
+st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🔄2- Nivelamento com Filas")
+st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="📊3- Comparativo ciclo Demand Review")
+st.sidebar.page_link("pages/4_codigobasevolumes.py", label="📈4- Histórico de volume nas revisões")
+# =================================
+
 # Ordem visual das colunas
 ORDEM_CICLOS = [
     "0+0 Bgt", "0+12", "01+11", "02+10", "03+09", "04+08",

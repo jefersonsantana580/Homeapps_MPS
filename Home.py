@@ -78,7 +78,7 @@ st.divider()
 
  
 st.subheader("📌 Entenda os aplicativos")  
-st.markdown("### 📈 Nivelamento sem filas")
+st.markdown("### 📈1- Nivelamento sem filas")
 st.markdown(
     """
      Realiza o nivelamento diário do volume e faz a criação de filas considerando os parâmetros inseridos no menu do app. 
@@ -86,7 +86,7 @@ st.markdown(
     """
 )
 st.divider()
-st.markdown("### 📉 Nivelamento com filas")
+st.markdown("### 🔄2- Nivelamento com Filas")
 st.markdown(
     """
     Realiza o nivelamento diário do volume considerando as filas existentes e sugere três possibilidades de ajuste, respeitando a capacidade diária informada.
@@ -109,7 +109,7 @@ Este app é ideal para cenários em que já existem filas criadas e é necessár
 st.markdown("---")
 
 
-st.markdown("### 📊 Comparativo de ciclo Demand Review")
+st.markdown("### 📊3- Comparativo ciclo Demand Review")
 st.markdown(
     """
     Este app tem como objetivo comparar o P.Request Vs Op.Plan e também F.Response Vs P.Request identificando e trazendo as diferenças por filial,

@@ -117,6 +117,16 @@ st.markdown(
     """
 )
 
+st.markdown("---")
+
+st.markdown("### 📈4- Histórico de volume nas revisões")
+st.markdown(
+    """
+     Mostra os volumes liberados por manufatura em cada ciclo mensal de Demand Review
+     
+    """
+)
+st.divider()
 
 
 st.markdown("---")

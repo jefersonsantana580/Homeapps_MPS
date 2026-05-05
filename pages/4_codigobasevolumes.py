@@ -1,34 +1,11 @@
-
 import streamlit as st
 import pandas as pd
-
 import io
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
-# === SIDEBAR (IGUAL AO HOME) ===
-st.markdown(
-    """
-    <style>
-        [data-testid="stSidebarNav"] {
-            display: none;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-st.sidebar.image("images/agco.jpg", width=240)
-st.sidebar.divider()
-
-st.sidebar.markdown("### 📊 Aplicações")
-st.sidebar.page_link("Home.py", label="🏠 Home")
-st.sidebar.page_link("pages/1_Nivelamento.py", label="📈 Nivelamento sem filas")
-st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🛠 Nivelamento com Filas")
-st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="🔄 Comparativo ciclo Demand Review")
-# =================================
 
 # =========================
 # Configuração da página
@@ -433,4 +410,3 @@ with col_a:
 with col_b:
     soma_geral = tabela[ORDEM_CICLOS].sum().sum()
     st.metric("Soma geral", f"{soma_geral:,.0f}".replace(",", "."))
-

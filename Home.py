@@ -129,11 +129,6 @@ st.markdown(
 st.divider()
 
 
-st.markdown("---")
-
-
-
-
 st.markdown(
     """
     <style>

@@ -37,7 +37,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.sidebar.image("images/agco.jpg", width=240)
+st.sidebar.image("images/agco.jpg")
 st.sidebar.divider()
 
 st.sidebar.page_link("Home.py", label="🏠 Home")

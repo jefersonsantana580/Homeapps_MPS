@@ -249,7 +249,19 @@ def montar_tabela_dinamica_cenario(df, coluna_data_cenario):
     )
     tabela.index.name = "MODELO"
 
-    return tabela.astype(int)
+   tabela = tabela.astype(int)
+
+# Oculta os zeros, mas mantém os totais visíveis
+tabela_visual = tabela.astype(object)
+
+colunas_dias = [
+    coluna for coluna in tabela_visual.columns
+    if coluna != "Total Geral"
+]
+
+tabela_visual[colunas_dias] = tabela_visual[colunas_dias].replace(0, "")
+
+return tabela_visual
 
 # =====================================================
 # Núcleo de balanceamento diário por MODELO

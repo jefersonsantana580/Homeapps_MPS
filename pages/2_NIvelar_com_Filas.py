@@ -20,26 +20,6 @@ import streamlit as st
 st.set_page_config(page_title="Nivelamento de Filas", layout="wide")
 st.title("📊 Nivelamento de Filas – Cenários 1, 2 e 3")
 
-# === SIDEBAR (IGUAL AO HOME) ===
-st.markdown(
-    """
-    <style>
-        [data-testid="stSidebarNav"] {
-            display: none;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-st.sidebar.image("images/agco.jpg")
-st.sidebar.divider()
-
-st.sidebar.page_link("Home.py", label="🏠 Home")
-st.sidebar.page_link("pages/1_Nivelamento.py", label="📈1- Nivelamento sem filas")
-st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🔄2- Nivelamento com Filas")
-st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="📊3- Comparativo ciclo Demand Review")
-st.sidebar.page_link("pages/4_codigobasevolumes.py", label="📈4- Histórico de volume nas revisões")
 # =====================================================
 # Parâmetro interno fixo
 # =====================================================
@@ -209,13 +189,7 @@ def garantir_colunas_resultado(df):
 
 
 def montar_tabela_dinamica_cenario(df, coluna_data_cenario):
-    """
-    Monta a visão resumida do cenário:
-    - MODELO nas linhas
-    - nova data do cenário nas colunas
-    - quantidade de NR_FILA nas células
-    - totais por modelo e por dia
-    """
+    """Monta MODELO x data, contando NR_FILA e ocultando zeros na visualização."""
     if df.empty or "MODELO" not in df.columns or coluna_data_cenario not in df.columns:
         return pd.DataFrame()
 
@@ -239,29 +213,22 @@ def montar_tabela_dinamica_cenario(df, coluna_data_cenario):
         margins_name="Total Geral"
     )
 
-    # Mantém as datas em ordem cronológica e o total na última coluna.
     colunas_data = sorted([c for c in tabela.columns if c != "Total Geral"])
     tabela = tabela[colunas_data + ["Total Geral"]]
-
-    # Formata somente os títulos das colunas para exibição.
-    tabela = tabela.rename(
-        columns={c: c.strftime("%d/%m/%Y") for c in colunas_data}
-    )
+    tabela = tabela.rename(columns={c: c.strftime("%d/%m/%Y") for c in colunas_data})
     tabela.index.name = "MODELO"
+    tabela = tabela.astype(int)
 
-   tabela = tabela.astype(int)
+    # Oculta os zeros apenas no corpo da tabela.
+    # A linha e a coluna Total Geral permanecem numéricas.
+    tabela_visual = tabela.astype(object)
+    colunas_dias = [c for c in tabela_visual.columns if c != "Total Geral"]
+    linhas_modelos = tabela_visual.index != "Total Geral"
+    tabela_visual.loc[linhas_modelos, colunas_dias] = (
+        tabela_visual.loc[linhas_modelos, colunas_dias].replace(0, "")
+    )
 
-# Oculta os zeros, mas mantém os totais visíveis
-tabela_visual = tabela.astype(object)
-
-colunas_dias = [
-    coluna for coluna in tabela_visual.columns
-    if coluna != "Total Geral"
-]
-
-tabela_visual[colunas_dias] = tabela_visual[colunas_dias].replace(0, "")
-
-return tabela_visual
+    return tabela_visual
 
 # =====================================================
 # Núcleo de balanceamento diário por MODELO
@@ -718,11 +685,6 @@ if "df_resultado" in st.session_state:
 
     df_view = df_view.fillna("")
 
-    # =====================================================
-    # Visão dinâmica dos três cenários
-    # MODELO nas linhas, datas nas colunas e quantidade nas células
-    # =====================================================
-
     st.subheader("📅 Distribuição diária por modelo")
     st.caption(
         "Cada aba mostra os modelos nas linhas, as novas datas nas colunas "
@@ -734,24 +696,16 @@ if "df_resultado" in st.session_state:
         ("Cenário 2", "NV DATA CENARIO 2"),
         ("Cenário 3", "NV DATA CENARIO 3"),
     ]
-
     abas = st.tabs([nome for nome, _ in configuracao_cenarios])
 
     for aba, (nome_cenario, coluna_cenario) in zip(abas, configuracao_cenarios):
         with aba:
-            tabela_cenario = montar_tabela_dinamica_cenario(
-                df_filtrado, coluna_cenario
-            )
-
+            tabela_cenario = montar_tabela_dinamica_cenario(df_filtrado, coluna_cenario)
             if tabela_cenario.empty:
                 st.info(f"Não há dados disponíveis para o {nome_cenario}.")
             else:
-                st.dataframe(
-                    tabela_cenario,
-                    use_container_width=True
-                )
+                st.dataframe(tabela_cenario, use_container_width=True)
 
-    # A tabela detalhada continua disponível, mas não ocupa a tela principal.
     with st.expander("🔎 Ver dados detalhados por NR_FILA"):
         st.dataframe(df_view, use_container_width=True, hide_index=True)
 

@@ -20,6 +20,26 @@ import streamlit as st
 st.set_page_config(page_title="Nivelamento de Filas", layout="wide")
 st.title("📊 Nivelamento de Filas – Cenários 1, 2 e 3")
 
+# === SIDEBAR (IGUAL AO HOME) ===
+st.markdown(
+    """
+    <style>
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.sidebar.image("images/agco.jpg")
+st.sidebar.divider()
+
+st.sidebar.page_link("Home.py", label="🏠 Home")
+st.sidebar.page_link("pages/1_Nivelamento.py", label="📈1- Nivelamento sem filas")
+st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🔄2- Nivelamento com Filas")
+st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="📊3- Comparativo ciclo Demand Review")
+st.sidebar.page_link("pages/4_codigobasevolumes.py", label="📈4- Histórico de volume nas revisões")
 # =====================================================
 # Parâmetro interno fixo
 # =====================================================

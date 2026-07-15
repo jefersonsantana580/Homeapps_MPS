@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 """
 Nivelamento de Filas - Cenários 1, 2 e 3
@@ -12,6 +11,41 @@ Autor: M365 Copilot p/ Jeferson Santana
 import io
 import pandas as pd
 import streamlit as st
+
+
+col1, col2 = st.columns([8, 2])
+
+
+with col2:
+    with open("arquivos_padrao/nivelamento_com_fila_padrao.xlsx", "rb") as file:
+        st.download_button(
+            label="📥 Baixar arquivo padrão",
+            data=file,
+            file_name="nivelamento_sem_fila_padrao.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+# === SIDEBAR (IGUAL AO HOME) ===
+st.markdown(
+    """
+    <style>
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.sidebar.image("images/agco.jpg")
+st.sidebar.divider()
+
+st.sidebar.page_link("Home.py", label="🏠 Home")
+st.sidebar.page_link("pages/1_Nivelamento.py", label="📈1- Nivelamento sem filas")
+st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🔄2- Nivelamento com Filas")
+st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="📊3- Comparativo ciclo Demand Review")
+st.sidebar.page_link("pages/4_codigobasevolumes.py", label="📈4- Histórico de volume nas revisões")
+# =================================
 
 # =====================================================
 # Configuração da página
@@ -82,15 +116,18 @@ def parse_feriados(text):
     return out
 
 
+
 def dias_uteis_mes(datas, feriados):
     datas_validas = pd.to_datetime(datas, errors="coerce").dropna()
     if datas_validas.empty:
         return []
 
+    # ✅ Primeiro e último dia do MÊS, e não da última data planejada
     first = datas_validas.min().replace(day=1)
-    last = datas_validas.max()
+    last = first + pd.offsets.MonthEnd(1)
 
     dias = pd.date_range(first, last, freq="D")
+
     dias = [
         d.normalize()
         for d in dias
@@ -98,6 +135,38 @@ def dias_uteis_mes(datas, feriados):
     ]
     return dias
 
+
+
+def ajustar_para_dia_util(data, dias):
+    """
+    Ajusta a data para um dia útil válido do mês.
+    Regras:
+    - se a data já for dia útil válido, mantém;
+    - se cair em feriado/fim de semana, empurra para o próximo dia útil;
+    - se não houver próximo, usa o último anterior.
+    """
+    if pd.isna(data) or not dias:
+        return pd.NaT
+
+    data = pd.to_datetime(data, errors="coerce")
+    if pd.isna(data):
+        return pd.NaT
+
+    data = data.normalize()
+    dias = sorted(pd.to_datetime(d).normalize() for d in dias)
+
+    if data in dias:
+        return data
+
+    futuros = [d for d in dias if d >= data]
+    if futuros:
+        return futuros[0]
+
+    anteriores = [d for d in dias if d <= data]
+    if anteriores:
+        return anteriores[-1]
+
+    return pd.NaT
 
 def encontrar_coluna_mes(df):
     """
@@ -187,49 +256,6 @@ def garantir_colunas_resultado(df):
 
     return df
 
-
-def montar_tabela_dinamica_cenario(df, coluna_data_cenario):
-    """Monta MODELO x data, contando NR_FILA e ocultando zeros na visualização."""
-    if df.empty or "MODELO" not in df.columns or coluna_data_cenario not in df.columns:
-        return pd.DataFrame()
-
-    base = df[["MODELO", "NR_FILA", coluna_data_cenario]].copy()
-    base[coluna_data_cenario] = pd.to_datetime(
-        base[coluna_data_cenario], errors="coerce"
-    ).dt.normalize()
-    base = base.dropna(subset=["MODELO", coluna_data_cenario])
-
-    if base.empty:
-        return pd.DataFrame()
-
-    tabela = pd.pivot_table(
-        base,
-        index="MODELO",
-        columns=coluna_data_cenario,
-        values="NR_FILA",
-        aggfunc="count",
-        fill_value=0,
-        margins=True,
-        margins_name="Total Geral"
-    )
-
-    colunas_data = sorted([c for c in tabela.columns if c != "Total Geral"])
-    tabela = tabela[colunas_data + ["Total Geral"]]
-    tabela = tabela.rename(columns={c: c.strftime("%d/%m/%Y") for c in colunas_data})
-    tabela.index.name = "MODELO"
-    tabela = tabela.astype(int)
-
-    # Oculta os zeros apenas no corpo da tabela.
-    # A linha e a coluna Total Geral permanecem numéricas.
-    tabela_visual = tabela.astype(object)
-    colunas_dias = [c for c in tabela_visual.columns if c != "Total Geral"]
-    linhas_modelos = tabela_visual.index != "Total Geral"
-    tabela_visual.loc[linhas_modelos, colunas_dias] = (
-        tabela_visual.loc[linhas_modelos, colunas_dias].replace(0, "")
-    )
-
-    return tabela_visual
-
 # =====================================================
 # Núcleo de balanceamento diário por MODELO
 # =====================================================
@@ -278,15 +304,11 @@ def aplicar_cenario1(df_mes, dias, capacidade):
     """
     Cenário 1:
     - FIFO por MODELO
-    - antecipação mínima
-    - usa a capacidade diária como meta de preenchimento
-    - preenche os dias desde o início do mês
-
-    Regra:
-    - Em cada dia, só pode ser escolhido o PRIMEIRO item ainda não alocado de cada MODELO
-      (isso preserva o FIFO por MODELO)
-    - Entre os candidatos elegíveis, escolhe primeiro quem tem DATA PLANEJADA mais próxima
-      do dia atual (menor antecipação)
+    - preserva a DATA PLANEJADA sempre que houver capacidade
+    - se o dia estiver cheio, antecipa para o dia útil anterior mais próximo
+    - se ainda assim não der, usa fallback para frente
+    - depois compacta os dias anteriores para aproximar da capacidade diária
+    - não deixa linhas sem data (desde que exista capacidade total no mês)
     """
 
     resultado = {}
@@ -294,78 +316,207 @@ def aplicar_cenario1(df_mes, dias, capacidade):
     if not dias:
         return resultado
 
-    dias = [pd.to_datetime(d).normalize() for d in dias]
+    dias = sorted(pd.to_datetime(d).normalize() for d in dias)
+    ocupacao = {d: 0 for d in dias}
 
-    # Filas por modelo em FIFO
-    filas_modelo = {}
-    for modelo, grupo in df_mes.groupby("MODELO"):
-        filas = grupo.sort_values(["DATA PLANEJADA", "NR_FILA"]).copy()
-        filas_modelo[modelo] = filas.index.tolist()
+    # -------------------------------------------------
+    # 1) Ajusta DATA PLANEJADA para dia útil válido
+    # -------------------------------------------------
+    df_trab = df_mes.copy()
+    df_trab["DATA_REFERENCIA_C1"] = df_trab["DATA PLANEJADA"].apply(
+        lambda x: ajustar_para_dia_util(x, dias)
+    )
 
-    # Controle de ponteiro por modelo
-    ponteiro_modelo = {modelo: 0 for modelo in filas_modelo.keys()}
+    # -------------------------------------------------
+    # 2) Estruturas para respeitar FIFO por MODELO
+    # -------------------------------------------------
+    ordem_modelo = {}
+    posicao_modelo = {}
 
-    # Função para pegar o próximo item elegível do modelo
-    def proximo_item_modelo(modelo):
-        idxs = filas_modelo[modelo]
-        pos = ponteiro_modelo[modelo]
+    for modelo, grupo in df_trab.groupby("MODELO", sort=False):
+        filas = grupo.sort_values(["DATA_REFERENCIA_C1", "NR_FILA"]).copy()
+        idxs = filas.index.tolist()
+        ordem_modelo[modelo] = idxs
+        for pos, idx in enumerate(idxs):
+            posicao_modelo[idx] = (modelo, pos)
 
-        if pos >= len(idxs):
-            return None
+    def limite_inferior_modelo(idx):
+        """
+        Último dia já alocado do item anterior do mesmo modelo.
+        """
+        modelo, pos = posicao_modelo[idx]
+        if pos == 0:
+            return dias[0]
 
-        idx = idxs[pos]
-        row = df_mes.loc[idx]
+        idx_anterior = ordem_modelo[modelo][pos - 1]
+        if idx_anterior in resultado:
+            return resultado[idx_anterior]
 
-        data_planejada = pd.to_datetime(row["DATA PLANEJADA"], errors="coerce")
-        if pd.isna(data_planejada):
-            return None
+        return dias[0]
 
-        return {
-            "idx": idx,
-            "modelo": modelo,
-            "data_planejada": data_planejada.normalize(),
-            "nr_fila": row["NR_FILA"]
-        }
+    def limite_superior_modelo(idx):
+        """
+        Dia já alocado do próximo item do mesmo modelo (se existir).
+        Serve para não quebrar FIFO ao mover.
+        """
+        modelo, pos = posicao_modelo[idx]
+        if pos >= len(ordem_modelo[modelo]) - 1:
+            return dias[-1]
 
-    # Preenche dia a dia
-    for dia in dias:
-        alocados_no_dia = 0
+        idx_proximo = ordem_modelo[modelo][pos + 1]
+        if idx_proximo in resultado:
+            return resultado[idx_proximo]
 
-        while alocados_no_dia < capacidade:
-            candidatos = []
+        return dias[-1]
 
-            for modelo in filas_modelo.keys():
-                item = proximo_item_modelo(modelo)
-                if item is None:
+    # -------------------------------------------------
+    # 3) 1ª PASSADA:
+    #    tenta manter na data original; se não couber, antecipa;
+    #    se ainda não der, joga para frente como fallback
+    # -------------------------------------------------
+    # Ordem global por data, mantendo FIFO natural do modelo
+    idxs_globais = (
+        df_trab.sort_values(["DATA_REFERENCIA_C1", "MODELO", "NR_FILA"])
+        .index.tolist()
+    )
+
+    for idx in idxs_globais:
+        row = df_trab.loc[idx]
+        data_ref = pd.to_datetime(row["DATA_REFERENCIA_C1"], errors="coerce")
+
+        if pd.isna(data_ref):
+            continue
+
+        data_ref = data_ref.normalize()
+
+        lim_inf = limite_inferior_modelo(idx)
+
+        # 3.1) tenta manter no próprio dia
+        if data_ref >= lim_inf and ocupacao.get(data_ref, 0) < capacidade:
+            dia_escolhido = data_ref
+
+        else:
+            # 3.2) tenta antecipar o mínimo possível
+            candidatos_anteriores = [
+                d for d in dias
+                if lim_inf <= d <= data_ref and ocupacao[d] < capacidade
+            ]
+
+            if candidatos_anteriores:
+                # pega o mais próximo possível da data original
+                dia_escolhido = candidatos_anteriores[-1]
+            else:
+                # 3.3) fallback para frente, evitando data vazia
+                candidatos_futuros = [
+                    d for d in dias
+                    if d >= max(lim_inf, data_ref) and ocupacao[d] < capacidade
+                ]
+
+                # se não houver >= data_ref, tenta qualquer vaga >= lim_inf
+                if not candidatos_futuros:
+                    candidatos_futuros = [
+                        d for d in dias
+                        if d >= lim_inf and ocupacao[d] < capacidade
+                    ]
+
+                if not candidatos_futuros:
+                    # sem capacidade no mês inteiro
                     continue
 
-                # só pode antecipar ou manter: data planejada >= dia
-                if item["data_planejada"] >= dia:
-                    candidatos.append(item)
+                dia_escolhido = candidatos_futuros[0]
 
-            # não há mais ninguém elegível para este dia
+        resultado[idx] = dia_escolhido
+        ocupacao[dia_escolhido] += 1
+
+    # -------------------------------------------------
+    # 4) 2ª PASSADA:
+    #    compacta os dias para aproximar do limite diário
+    #    puxando itens de dias futuros para trás
+    # -------------------------------------------------
+    def pode_mover(idx, novo_dia):
+        """
+        Verifica se mover o item para novo_dia respeita FIFO do MODELO.
+        """
+        lim_inf = limite_inferior_modelo(idx)
+        lim_sup = limite_superior_modelo(idx)
+        return lim_inf <= novo_dia <= lim_sup
+
+    for dia in dias:
+        while ocupacao[dia] < capacidade:
+            candidatos = []
+
+            for idx, dia_atual in resultado.items():
+                if dia_atual <= dia:
+                    continue  # só puxa de dias futuros
+
+                row = df_trab.loc[idx]
+                data_ref = pd.to_datetime(row["DATA_REFERENCIA_C1"], errors="coerce")
+                if pd.isna(data_ref):
+                    continue
+
+                data_ref = data_ref.normalize()
+
+                # mover para trás só faz sentido se ainda for antecipação/manutenção
+                if dia > data_ref:
+                    continue
+
+                if not pode_mover(idx, dia):
+                    continue
+
+                candidatos.append(
+                    (
+                        (dia_atual - dia).days,      # mover o mínimo possível
+                        (data_ref - dia).days,       # menor antecipação extra
+                        row["NR_FILA"],
+                        idx
+                    )
+                )
+
             if not candidatos:
                 break
 
-            # prioridade:
-            # 1) menor antecipação possível -> menor DATA PLANEJADA >= dia
-            # 2) menor NR_FILA
-            # 3) nome do modelo como critério estável
-            candidatos = sorted(
-                candidatos,
-                key=lambda x: (x["data_planejada"], x["nr_fila"], str(x["modelo"]))
-            )
+            candidatos.sort()
+            idx_escolhido = candidatos[0][3]
+            dia_antigo = resultado[idx_escolhido]
 
-            escolhido = candidatos[0]
+            resultado[idx_escolhido] = dia
+            ocupacao[dia] += 1
+            ocupacao[dia_antigo] -= 1
 
-            resultado[escolhido["idx"]] = dia
-            alocados_no_dia += 1
+    # -------------------------------------------------
+    # 5) 3ª PASSADA DE SEGURANÇA:
+    #    se ainda restou algum índice sem data, tenta alocar
+    #    na primeira vaga possível respeitando FIFO
+    # -------------------------------------------------
+    idxs_nao_alocados = [idx for idx in df_trab.index if idx not in resultado]
 
-            # avança o ponteiro do modelo escolhido
-            ponteiro_modelo[escolhido["modelo"]] += 1
+    for idx in idxs_nao_alocados:
+        row = df_trab.loc[idx]
+        data_ref = pd.to_datetime(row["DATA_REFERENCIA_C1"], errors="coerce")
+
+        if pd.isna(data_ref):
+            data_ref = dias[0]
+        else:
+            data_ref = data_ref.normalize()
+
+        lim_inf = limite_inferior_modelo(idx)
+
+        candidatos = [
+            d for d in dias
+            if d >= lim_inf and ocupacao[d] < capacidade and pode_mover(idx, d)
+        ]
+
+        if not candidatos:
+            continue
+
+        # prioriza manter na data ou o mais próximo possível
+        candidatos = sorted(candidatos, key=lambda d: (abs((d - data_ref).days), d))
+        dia_escolhido = candidatos[0]
+
+        resultado[idx] = dia_escolhido
+        ocupacao[dia_escolhido] += 1
 
     return resultado
-
 
 
 # =====================================================
@@ -685,29 +836,7 @@ if "df_resultado" in st.session_state:
 
     df_view = df_view.fillna("")
 
-    st.subheader("📅 Distribuição diária por modelo")
-    st.caption(
-        "Cada aba mostra os modelos nas linhas, as novas datas nas colunas "
-        "e a quantidade de filas programadas em cada dia."
-    )
-
-    configuracao_cenarios = [
-        ("Cenário 1", "NV DATA CENARIO 1"),
-        ("Cenário 2", "NV DATA CENARIO 2"),
-        ("Cenário 3", "NV DATA CENARIO 3"),
-    ]
-    abas = st.tabs([nome for nome, _ in configuracao_cenarios])
-
-    for aba, (nome_cenario, coluna_cenario) in zip(abas, configuracao_cenarios):
-        with aba:
-            tabela_cenario = montar_tabela_dinamica_cenario(df_filtrado, coluna_cenario)
-            if tabela_cenario.empty:
-                st.info(f"Não há dados disponíveis para o {nome_cenario}.")
-            else:
-                st.dataframe(tabela_cenario, use_container_width=True)
-
-    with st.expander("🔎 Ver dados detalhados por NR_FILA"):
-        st.dataframe(df_view, use_container_width=True, hide_index=True)
+    st.dataframe(df_view, use_container_width=True, hide_index=True)
 
     # =====================================================
     # Download do resultado completo
@@ -730,17 +859,40 @@ if "df_resultado" in st.session_state:
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df_download.to_excel(writer, index=False, sheet_name="RESULTADO")
 
-        for numero, coluna_cenario in enumerate(
-            ["NV DATA CENARIO 1", "NV DATA CENARIO 2", "NV DATA CENARIO 3"],
-            start=1
-        ):
-            resumo = montar_tabela_dinamica_cenario(df_resultado, coluna_cenario)
-            if not resumo.empty:
-                resumo.to_excel(writer, sheet_name=f"CENARIO {numero}")
-
     st.download_button(
         "📥 Baixar Excel",
         data=output.getvalue(),
         file_name="nivelamento_final_cenarios_1_2_3.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+
+st.markdown(
+    """
+    <style>
+    :root {
+        --sidebar-width: 21rem;
+    }
+
+    .footer-bar {
+        position: fixed;
+        bottom: 0;
+        left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+        background-color: rgba(14, 17, 23, 0.95);
+        color: #ccc;
+        font-size: 0.75rem;
+        text-align: center;
+        padding: 8px 0;
+        z-index: 999;
+        border-top: 1px solid #333;
+        backdrop-filter: blur(4px);
+    }
+    </style>
+
+    <div class="footer-bar">
+        Aplicação desenvolvida para suporte às análises do time MPS • Versão 1.0 — Jeferson Santana / Copilot
+    </div>
+    """,
+    unsafe_allow_html=True
+)

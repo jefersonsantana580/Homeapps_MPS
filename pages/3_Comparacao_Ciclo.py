@@ -79,6 +79,30 @@ def _normalize_header(col):
     return s
 
 
+def normalizar_colunas_mes(df):
+    """
+    Renomeia somente as colunas reconhecidas como mês.
+
+    Exemplo:
+    2027-01-01 00:00:00 -> jan/27
+
+    As demais colunas permanecem exatamente como estão.
+    """
+    if df is None:
+        return None
+
+    df = df.copy()
+    renomear = {}
+
+    for coluna_original in df.columns:
+        coluna_normalizada = _normalize_header(coluna_original)
+
+        if MES_RE.match(coluna_normalizada or ""):
+            renomear[coluna_original] = coluna_normalizada
+
+    return df.rename(columns=renomear)
+
+
 def detectar_colunas_mes(df):
     cols_mes = []
     debug_map = {}
@@ -282,6 +306,12 @@ def gerar_passo1(xlsx_bytes, show_debug=False, visao="Request - Plan", incluir_o
     fr = None
     if "F.RESPONSE" in xls_original.sheet_names:
         fr = pd.read_excel(xls_original, "F.RESPONSE", engine="openpyxl")
+
+    # Renomeia somente as colunas de mês.
+    # Exemplo: 2027-01-01 00:00:00 -> jan/27
+    plan = normalizar_colunas_mes(plan)
+    req = normalizar_colunas_mes(req)
+    fr = normalizar_colunas_mes(fr)
 
     if visao == "F.Response - Request" and fr is None:
         raise ValueError("Aba 'F.RESPONSE' não encontrada no Excel enviado.")

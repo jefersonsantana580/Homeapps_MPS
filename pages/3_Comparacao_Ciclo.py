@@ -713,7 +713,7 @@ def gerar_passo1(xlsx_bytes, show_debug=False, visao="Request - Plan", incluir_o
     att["TOTAL"] = (sup_tot / dem_tot * 100).where(dem_tot > 0, 100.0)
 
     for c in ['Q1', 'Q2', 'Q3', 'Q4', 'TOTAL']:
-        att[c] = att[c].clip(lower=0, upper=100)
+        att[c] = att[c].clip(lower=0)  # permite atendimento acima de 100%
 
     df_atendimento = att[grp_att + ['Q1', 'Q2', 'Q3', 'Q4', 'TOTAL']].copy()
     df_atendimento = remover_linhas_sem_chave(df_atendimento, grp_att)
@@ -728,12 +728,12 @@ def gerar_passo1(xlsx_bytes, show_debug=False, visao="Request - Plan", incluir_o
         sup_q = sum(att[f"{m}_SUP"] for m in mlist).sum()
 
         total_att[q] = (sup_q / dem_q * 100) if dem_q > 0 else 100.0
-        total_att[q] = max(0.0, min(100.0, total_att[q]))
+        total_att[q] = max(0.0, total_att[q])  # permite atendimento acima de 100%
 
     dem_t = dem_tot.sum()
     sup_t = sup_tot.sum()
     total_att['TOTAL'] = (sup_t / dem_t * 100) if dem_t > 0 else 100.0
-    total_att['TOTAL'] = max(0.0, min(100.0, total_att['TOTAL']))
+    total_att['TOTAL'] = max(0.0, total_att['TOTAL'])  # permite atendimento acima de 100%
 
     df_atendimento = pd.concat([df_atendimento, pd.DataFrame([total_att])], ignore_index=True)
 

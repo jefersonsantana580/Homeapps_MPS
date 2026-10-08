@@ -9,6 +9,20 @@ import plotly.graph_objects as go
 from plotly.offline import get_plotlyjs
 
 st.set_page_config(page_title="Histórico de volumes nas revisões", layout="wide")
+
+# Logo existente no repositorio; nao altera a navegacao ou o painel HTML.
+_raiz_pagina = Path(__file__).resolve().parent
+_candidatos_logo = [
+    _raiz_pagina.parent / "images" / "agco.jpg",
+    _raiz_pagina / "images" / "agco.jpg",
+    Path("images/agco.jpg"),
+]
+_logo_mps = next((p for p in _candidatos_logo if p.is_file()), None)
+if _logo_mps is not None:
+    st.logo(str(_logo_mps), size="large")
+else:
+    st.sidebar.warning("Logo não encontrado: images/agco.jpg")
+
 ORDEM_CICLOS = ["0+0 Bgt", "0+12", "01+11", "02+10", "03+09", "04+08", "05+07", "06+06", "07+05", "08+04", "09+03", "10+02", "11+01", "12+0"]
 ARQUIVO_EXCEL = "dados/base_volume_sites.xlsx"
 ABA = "base"

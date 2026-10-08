@@ -1,453 +1,152 @@
-import streamlit as st
-import pandas as pd
+"""Pagina 4: historico de revisoes em HTML, sem servicos externos."""
 import io
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-import matplotlib.pyplot as plt
+import json
+import html
+from pathlib import Path
+import pandas as pd
+import streamlit as st
 import plotly.graph_objects as go
+from plotly.offline import get_plotlyjs
 
-
-# =========================
-# Configuração da página
-# =========================
-st.set_page_config(
-    page_title="Visão de Volumes",
-    layout="wide"
-)
-
-st.title("📊 Histórico de volume nas revisões DR")
-
-# === SIDEBAR (IGUAL AO HOME) ===
-st.markdown(
-    """
-    <style>
-        [data-testid="stSidebarNav"] {
-            display: none;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-st.sidebar.image("images/agco.jpg")
-st.sidebar.divider()
-
-st.sidebar.page_link("Home.py", label="🏠 Home")
-st.sidebar.page_link("pages/1_Nivelamento.py", label="📈1- Nivelamento sem filas")
-st.sidebar.page_link("pages/2_NIvelar_com_Filas.py", label="🔄2- Nivelamento com Filas")
-st.sidebar.page_link("pages/3_Comparacao_Ciclo.py", label="📊3- Comparativo ciclo Demand Review")
-st.sidebar.page_link("pages/4_codigobasevolumes.py", label="📈4- Histórico de volume nas revisões")
-# =================================
-
-# Ordem visual das colunas
-ORDEM_CICLOS = [
-    "0+0 Bgt", "0+12", "01+11", "02+10", "03+09", "04+08",
-    "05+07", "06+06", "07+05", "08+04", "09+03", "10+02", "11+01", "12+0"
-]
-
+st.set_page_config(page_title="Histórico de volumes nas revisões", layout="wide")
+ORDEM_CICLOS = ["0+0 Bgt", "0+12", "01+11", "02+10", "03+09", "04+08", "05+07", "06+06", "07+05", "08+04", "09+03", "10+02", "11+01", "12+0"]
 ARQUIVO_EXCEL = "dados/base_volume_sites.xlsx"
 ABA = "base"
+CORES = {"DF":"#1F77B4", "MOM":"#6DC8A0", "RIG":"#6F4C9B", "TA":"#D62728", "PU":"#2CA02C", "CO":"#FF7F0E", "CO PKD":"#8C564B"}
 
+def localizar_base():
+    candidatos = [Path(ARQUIVO_EXCEL), Path(__file__).resolve().parent / ARQUIVO_EXCEL, Path(__file__).resolve().parent.parent / ARQUIVO_EXCEL]
+    for caminho in candidatos:
+        if caminho.is_file():
+            return caminho
+    raise FileNotFoundError(f"Base não encontrada: {ARQUIVO_EXCEL}")
 
-# =========================
-# Funções
-# =========================
 @st.cache_data
-def carregar_dados():
-    df = pd.read_excel(
-        ARQUIVO_EXCEL,
-        sheet_name=ABA,
-        engine="openpyxl"
-    )
-
+def carregar_dados(caminho, modificacao):
+    df = pd.read_excel(caminho, sheet_name=ABA, engine="openpyxl")
     df.columns = df.columns.astype(str).str.strip()
+    obrigatorias = ["Tipo Base", "ANO", "BRAND", "PRODUCT MARKET", "SITE", "Product DR", "Nº CICLO", "Total"]
+    faltantes = [c for c in obrigatorias if c not in df.columns]
+    if faltantes:
+        raise ValueError("Colunas ausentes: " + ", ".join(faltantes))
+    for c in ["Tipo Base", "BRAND", "PRODUCT MARKET", "SITE", "Product DR", "Nº CICLO"]:
+        df[c] = df[c].fillna("").astype(str).str.strip()
+    for c in ["Tipo Base", "SITE", "Product DR"]:
+        df[c] = df[c].str.upper()
+    df["Nº CICLO"] = df["Nº CICLO"].replace({"0+0 BGT":"0+0 Bgt", "0+0 bgt":"0+0 Bgt"})
+    df["ANO"] = df["ANO"].map(lambda x: str(int(x)) if pd.notna(x) and isinstance(x, (int, float)) and float(x).is_integer() else str(x).strip() if pd.notna(x) else "")
+    df["Total"] = pd.to_numeric(df["Total"], errors="coerce").fillna(0)
+    df = df[df["Tipo Base"].eq("F_RESPONSE")].copy()
+    return df[~(df["Product DR"].eq("PC") | (df["SITE"].eq("GENERAL RODRIGUEZ") & df["Product DR"].eq("CO")))].copy()
 
-    colunas_texto = [
-        "Tipo Base",
-        "Nº CICLO",
-        "SITE",
-        "Product DR",
-        "BRAND",
-        "PRODUCT MARKET"
-    ]
+def consolidar(df, ciclos):
+    # Sem fill_value: ausencia de registro nao deve virar volume zero.
+    return df.pivot_table(index=["SITE", "Product DR"], columns="Nº CICLO", values="Total", aggfunc="sum").reindex(columns=ciclos).reset_index().sort_values(["SITE", "Product DR"])
 
-    for col in colunas_texto:
-        if col in df.columns:
-            df[col] = df[col].astype(str).str.strip()
+def fmt(v, sinal=False):
+    if pd.isna(v):
+        return "—"
+    return (f"{v:+,.0f}" if sinal else f"{v:,.0f}").replace(",", ".")
 
-    if "Tipo Base" in df.columns:
-        df["Tipo Base"] = df["Tipo Base"].str.upper()
+def excel(tabela, resumo):
+    b = io.BytesIO()
+    with pd.ExcelWriter(b, engine="openpyxl") as w:
+        tabela.to_excel(w, sheet_name="Historico", index=False)
+        resumo.to_excel(w, sheet_name="Comparativo", index=False)
+        for ws in w.book.worksheets:
+            ws.freeze_panes = "C2"
+            ws.auto_filter.ref = ws.dimensions
+            for col in ws.columns:
+                ws.column_dimensions[col[0].column_letter].width = max(15, min(32, max(len(str(c.value or "")) for c in col) + 2))
+    return b.getvalue()
 
-    if "Nº CICLO" in df.columns:
-        df["Nº CICLO"] = df["Nº CICLO"].replace({
-            "0+0 BGT": "0+0 Bgt",
-            "0+0 bgt": "0+0 Bgt",
-            "0+0 Bgt ": "0+0 Bgt"
-        })
+def painel(tabela, resumo, ciclos, referencia, atual, contexto):
+    totais = tabela[ciclos].sum(min_count=1)
+    # KPI comparativo usa somente pares com registros nos dois ciclos.
+    pares = resumo.dropna(subset=["Referência", "Atual"])
+    base = pares["Referência"].sum() if len(pares) else float("nan")
+    final = pares["Atual"].sum() if len(pares) else float("nan")
+    delta = final - base
+    percentual = f"{delta / base * 100:+.1f}%".replace(".", ",") if pd.notna(base) and base != 0 else "N/A"
+    esc = lambda x: html.escape(str(x), quote=True)
+    cards = [("Volume no ciclo selecionado", fmt(totais[atual]), atual), ("Referência comparável", fmt(base), referencia), ("Diferença comparável", fmt(delta, True), f"{atual} − {referencia}"), ("Variação comparável", percentual, f"{len(pares)} pares com registros nos dois ciclos")]
+    cards_html = ''.join(f'<div class="card"><small>{esc(a)}</small><strong>{esc(b)}</strong><span>{esc(c)}</span></div>' for a,b,c in cards)
+    fig = go.Figure()
+    for produto in sorted(tabela["Product DR"].unique()):
+        sub = tabela[tabela["Product DR"].eq(produto)]
+        vals = sub[ciclos].sum(min_count=1)
+        fig.add_trace(go.Scatter(x=ciclos, y=vals.tolist(), name=esc(produto), mode="lines+markers+text", connectgaps=False, text=[fmt(v) for v in vals], textposition="top center", line=dict(color=CORES.get(produto, "#64748b"), width=3), hovertemplate="%{x}<br>Volume: %{y:,.0f}<extra>%{fullData.name}</extra>"))
+    fig.update_layout(template="plotly_white", height=340, margin=dict(l=30,r=30,t=35,b=35), legend=dict(orientation="h",y=1.16), yaxis_title="Volume", xaxis=dict(type="category"), font=dict(family="Arial",color="#334155"))
+    grafico = fig.to_html(full_html=False, include_plotlyjs=False, config={"displaylogo":False,"responsive":True})
+    cabecalho = '<th>Filial</th><th>Product DR</th>' + ''.join(f'<th>{esc(c)}</th>' for c in ciclos) + '<th>Diferença</th>'
+    linhas=[]
+    for _, row in tabela.iterrows():
+        cells=[f'<td class="fixed">{esc(row["SITE"])}</td>',f'<td>{esc(row["Product DR"])}</td>']
+        anterior=None
+        for c in ciclos:
+            v=row[c]
+            classe=""
+            if anterior is not None and pd.notna(v) and pd.notna(anterior):
+                classe="up" if v>anterior else "down" if v<anterior else ""
+            cells.append(f'<td class="{classe}">{fmt(v)}</td>')
+            anterior=v
+        d=row[atual]-row[referencia]
+        cells.append(f'<td class="diff">{fmt(d,True)}</td>')
+        linhas.append('<tr>'+''.join(cells)+'</tr>')
+    ranking=resumo.dropna(subset=["Diferença"]).sort_values("Diferença",key=lambda s:s.abs(),ascending=False).head(6)
+    lista=''.join(f'<div class="change"><span>{esc(r["SITE"])} · {esc(r["Product DR"])}</span><b>{fmt(r["Diferença"],True)}</b></div>' for _,r in ranking.iterrows()) or '<p>Sem pares comparáveis.</p>'
+    css="""*{box-sizing:border-box}body{margin:0;background:#f3f5f9;color:#172b4d;font-family:Arial,sans-serif;padding:22px}.hero{background:linear-gradient(110deg,#142338,#263f5c);border-radius:16px;padding:25px;color:white}.hero h1{margin:5px 0 10px;font-size:26px}.hero p{color:#d0dbea;font-size:13px}.tag{font-size:11px;letter-spacing:2px;color:#a8c4e4}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.card,.panel{background:white;border:1px solid #e1e7ef;border-radius:14px;padding:19px}.card small{color:#64748b;display:block}.card strong{display:block;font-size:30px;margin:12px 0}.card span{font-size:12px;color:#64748b}.grid{display:grid;grid-template-columns:3fr 1fr;gap:16px}.panel h2{font-size:17px;margin:0 0 12px}.change{display:flex;justify-content:space-between;gap:10px;padding:14px 0;border-bottom:1px solid #edf1f6;font-size:12px}.change b{white-space:nowrap}.tablepanel{margin-top:16px}.scroll{overflow:auto;max-height:480px}table{border-collapse:separate;border-spacing:0;width:100%;font-size:12px;white-space:nowrap}th{position:sticky;top:0;background:#e9eef5;text-align:right;padding:13px;z-index:2}td{padding:12px;text-align:right;border-bottom:1px solid #edf1f6}td:first-child,th:first-child{text-align:left}tr:nth-child(even){background:#f8fafc}.up{background:#e8f5ee;color:#166534}.down{background:#fff0ee;color:#a12727}.diff{font-weight:bold;background:#eef2ff}.note{font-size:12px;color:#64748b;line-height:1.6}input{border:1px solid #cbd5e1;border-radius:8px;padding:10px;width:280px;margin:0 0 14px}@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}"""
+    return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+css+'</style><script>'+get_plotlyjs()+'</script></head><body><div class="hero"><div class="tag">MPS · HISTÓRICO DE REVISÕES</div><h1>Evolução dos volumes</h1><p>'+esc(contexto)+'</p></div><div class="cards">'+cards_html+'</div><div class="grid"><section class="panel"><h2>Volumes por ciclo e produto</h2>'+grafico+'</section><section class="panel"><h2>Maiores mudanças em volume</h2><p class="note">'+esc(atual)+' − '+esc(referencia)+'</p>'+lista+'</section></div><section class="panel tablepanel"><h2>Histórico consolidado</h2><p class="note">Verde: aumento. Vermelho: redução em relação ao ciclo anterior exibido. Cores não indicam avaliação de desempenho. —: sem registro. Zero: volume registrado igual a zero.</p><input id="busca" placeholder="Buscar filial ou produto" aria-label="Buscar na tabela"><div class="scroll"><table><thead><tr>'+cabecalho+'</tr></thead><tbody>'+''.join(linhas)+'</tbody></table></div><p class="note">'+str(len(tabela))+' linhas. KPIs de diferença consideram apenas pares presentes nos dois ciclos. Ciclos são revisões do mesmo volume: não são somados entre si.</p></section><script>document.getElementById("busca").addEventListener("input",function(){const q=this.value.toLocaleLowerCase();document.querySelectorAll("tbody tr").forEach(r=>{r.style.display=r.textContent.toLocaleLowerCase().includes(q)?"":"none";});});</script></body></html>'
 
-    if "Total" in df.columns:
-        df["Total"] = pd.to_numeric(df["Total"], errors="coerce").fillna(0)
-
-    return df
-
-
-def aplicar_filtro_opcional(df, coluna, valor):
-    if valor == "Todos":
-        return df
-    return df[df[coluna] == valor]
-
-
-def aplicar_filtro_multiplos(df, coluna, valores):
-    if not valores:
-        return df
-    return df[df[coluna].isin(valores)]
-
-
-def render_checkbox_filter(label, options, key_prefix):
-    selecionados = []
-
-    with st.popover(label, use_container_width=True):
-        st.caption(f"Selecione um ou mais itens de {label}")
-
-        for opt in options:
-            opt_str = str(opt)
-            if st.checkbox(opt_str, key=f"{key_prefix}_{opt_str}"):
-                selecionados.append(opt)
-
-    return selecionados
-
-
-# ===== Exportação =====
-def gerar_excel(df):
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        df.to_excel(writer, index=False, sheet_name="Tabela")
-    output.seek(0)
-    return output
-
-
-def gerar_pdf(df):
-    buffer = io.BytesIO()
-    c = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
-
-    c.setFont("Helvetica", 8)
-    x_start = 30
-    y = height - 40
-
-    # Cabeçalho
-    x = x_start
-    for col in df.columns:
-        c.drawString(x, y, str(col))
-        x += 50
-
-    y -= 15
-
-    # Linhas
-    for _, row in df.iterrows():
-        x = x_start
-        for value in row:
-            c.drawString(x, y, str(value))
-            x += 50
-        y -= 12
-
-        if y < 40:
-            c.showPage()
-            c.setFont("Helvetica", 8)
-            y = height - 40
-
-    c.save()
-    buffer.seek(0)
-    return buffer
-
-
-# =========================
-# Carga de dados
-# =========================
+st.title("Histórico de volumes nas revisões")
+st.caption("Selecione o recorte. O painel HTML acompanha os filtros, sem alterar a base original.")
 try:
-    df = carregar_dados()
+    caminho = localizar_base()
+    df = carregar_dados(str(caminho), caminho.stat().st_mtime_ns)
 except Exception as e:
-    st.error(f"Erro ao carregar o arquivo Excel: {e}")
+    st.error(f"Erro ao carregar a base: {e}")
     st.stop()
-
-
-colunas_necessarias = [
-    "Tipo Base", "ANO", "BRAND", "PRODUCT MARKET",
-    "SITE", "Product DR", "Nº CICLO", "Total"
-]
-
-colunas_faltantes = [c for c in colunas_necessarias if c not in df.columns]
-if colunas_faltantes:
-    st.error(f"Colunas obrigatórias não encontradas: {', '.join(colunas_faltantes)}")
+if df.empty:
+    st.warning("Sem dados F_RESPONSE após as exclusões.")
     st.stop()
-
-
-# =========================
-# Filtro fixo
-# =========================
-df = df[df["Tipo Base"] == "F_RESPONSE"].copy()
-
-
-# =========================
-# Filtros da tela
-# =========================
-st.subheader("Filtros")
-
-col1, col2, col3, col4 = st.columns(4)
-
-anos = sorted(df["ANO"].dropna().unique().tolist())
-brands = sorted(df["BRAND"].dropna().astype(str).str.strip().unique().tolist())
-markets = sorted(df["PRODUCT MARKET"].dropna().astype(str).str.strip().unique().tolist())
-product_drs = sorted(
-    df["Product DR"]
-    .dropna()
-    .astype(str)
-    .str.strip()
-    .str.upper()
-    .unique()
-    .tolist()
-)
-
-with col1:
-    ano_sel = render_checkbox_filter("ANO", anos, "ano")
-
-with col2:
-    brand_sel = render_checkbox_filter("BRAND", brands, "brand")
-
-with col3:
-    market_sel = render_checkbox_filter("PRODUCT MARKET", markets, "market")
-
-with col4:
-    product_dr_sel = render_checkbox_filter("PRODUCT DR", product_drs, "productdr")
-
-
-df_filtrado = df.copy()
-
-# padronização antes dos filtros textuais
-df_filtrado["SITE"] = df_filtrado["SITE"].astype(str).str.strip().str.upper()
-df_filtrado["Product DR"] = df_filtrado["Product DR"].astype(str).str.strip().str.upper()
-df_filtrado["BRAND"] = df_filtrado["BRAND"].astype(str).str.strip()
-df_filtrado["PRODUCT MARKET"] = df_filtrado["PRODUCT MARKET"].astype(str).str.strip()
-
-# aplica filtros múltiplos
-df_filtrado = aplicar_filtro_multiplos(df_filtrado, "ANO", ano_sel)
-df_filtrado = aplicar_filtro_multiplos(df_filtrado, "BRAND", brand_sel)
-df_filtrado = aplicar_filtro_multiplos(df_filtrado, "PRODUCT MARKET", market_sel)
-df_filtrado = aplicar_filtro_multiplos(df_filtrado, "Product DR", product_dr_sel)
-
-# regras de exclusão
-df_filtrado = df_filtrado[
-    ~(
-        (df_filtrado["Product DR"] == "PC") |
-        (
-            (df_filtrado["SITE"] == "GENERAL RODRIGUEZ") &
-            (df_filtrado["Product DR"] == "CO")
-        )
-    )
-]
-
-
-# =========================
-# Pivot da tabela
-# =========================
-if df_filtrado.empty:
-    st.warning("Nenhum dado encontrado para os filtros selecionados.")
+cols=st.columns(5)
+anos=sorted([a for a in df["ANO"].unique() if a])
+if not anos:
+    st.error("Nenhum ano válido na base.")
     st.stop()
-
-tabela = (
-    df_filtrado
-    .pivot_table(
-        values="Total",
-        index=["SITE", "Product DR"],
-        columns="Nº CICLO",
-        aggfunc="sum",
-        fill_value=0
-    )
-    .reset_index()
-)
-
-for ciclo in ORDEM_CICLOS:
-    if ciclo not in tabela.columns:
-        tabela[ciclo] = 0
-
-tabela = tabela[["SITE", "Product DR"] + ORDEM_CICLOS]
-tabela = tabela.sort_values(["SITE", "Product DR"]).reset_index(drop=True)
-
-
-# =========================
-# Exibição
-# =========================
-st.subheader("Tabela consolidada")
-st.caption("Valor exibido: soma da coluna Total")
-st.dataframe(tabela, use_container_width=True, hide_index=True)
-
-
-# =========================
-# Gráficos por filial
-# =========================
-st.divider()
-st.subheader("📈 Gráficos por filial")
-st.caption("Cada gráfico mostra os volumes por ciclo e produto.")
-
-# mesma cor para o mesmo Product DR em qualquer filial
-cores_produtos = {
-    "DF": "#1F77B4",      # azul forte
-    "MOM": "#6DC8A0",     # verde água
-    "RIG": "#6F4C9B",     # roxo
-    "TA": "#D62728",      # vermelho
-    "PU": "#2CA02C",      # verde
-    "CO": "#FF7F0E",      # laranja
-    "CO PKD": "#8C564B"   # marrom
-}
-
-sites_unicos = sorted(tabela["SITE"].dropna().unique().tolist())
-
-if not sites_unicos:
-    st.info("Nenhuma filial encontrada para exibir gráficos.")
+ano=cols[0].selectbox("Ano",anos,index=len(anos)-1,key="hist_ano")
+recorte=df[df["ANO"].eq(ano)].copy()
+for container,col,label in zip(cols[1:],["SITE","Product DR","PRODUCT MARKET","BRAND"],["Filial","Product DR","Mercado","Marca"]):
+    escolhas=container.multiselect(label,sorted(recorte[col].unique()),key="hist_"+col,placeholder="Todos")
+    if escolhas:
+        recorte=recorte[recorte[col].isin(escolhas)]
+if recorte.empty:
+    st.warning("Nenhum dado para os filtros selecionados.")
+    st.stop()
+desconhecidos=sorted(set(recorte["Nº CICLO"])-set(ORDEM_CICLOS))
+if desconhecidos:
+    st.warning("Ciclos fora da ordem configurada, não exibidos: "+", ".join(desconhecidos))
+ciclos=[c for c in ORDEM_CICLOS if c in set(recorte["Nº CICLO"])]
+if not ciclos:
+    st.warning("Nenhum ciclo reconhecido.")
+    st.stop()
+a,b=st.columns(2)
+referencia=a.selectbox("Ciclo de referência",ciclos,key="hist_ref")
+atual=b.selectbox("Ciclo de comparação",ciclos,index=len(ciclos)-1,key="hist_atual")
+st.caption("O ciclo de comparação padrão é o último com registros na ordem configurada, inclusive quando o volume é zero. Ajuste acima se necessário.")
+tabela=consolidar(recorte,ciclos)
+resumo=tabela[["SITE","Product DR"]].copy()
+resumo["Referência"]=tabela[referencia]
+resumo["Atual"]=tabela[atual]
+resumo["Diferença"]=resumo["Atual"]-resumo["Referência"]
+contexto=f"Ano {ano} | "+" | ".join(f"{c}: {', '.join(sorted(recorte[c].unique()))}" for c in ["SITE","Product DR","PRODUCT MARKET","BRAND"])
+documento=painel(tabela,resumo,ciclos,referencia,atual,contexto)
+if hasattr(st,"iframe"):
+    st.iframe(documento,height=1100)
 else:
-    sites_graficos = sites_unicos[:5]
-
-    for i in range(0, len(sites_graficos), 2):
-        cols = st.columns(2)
-
-        for j, site in enumerate(sites_graficos[i:i+2]):
-            with cols[j]:
-                df_site = tabela[tabela["SITE"] == site].copy()
-
-                # linhas = ciclos / colunas = Product DR
-                df_plot = df_site.set_index("Product DR")[ORDEM_CICLOS].T
-
-                if df_plot.empty:
-                    st.info(f"{site}: sem volume para exibir.")
-                    continue
-
-                # ordem fixa dos produtos
-                ordem_fixa_produtos = ["DF", "MOM", "RIG", "TA", "PU", "CO", "CO PKD"]
-                produtos_existentes = [p for p in ordem_fixa_produtos if p in df_plot.columns]
-                outros_produtos = [p for p in df_plot.columns if p not in produtos_existentes]
-                df_plot = df_plot[produtos_existentes + outros_produtos]
-
-                fig = go.Figure()
-
-                # barras empilhadas por produto
-                for produto in df_plot.columns:
-                    valores = df_plot[produto].fillna(0)
-
-                    fig.add_trace(
-                        go.Bar(
-                            x=df_plot.index.tolist(),
-                            y=valores.tolist(),
-                            name=produto,
-                            marker_color=cores_produtos.get(produto, "#666666"),
-                            text=[f"{int(v):,}".replace(",", ".") if v > 0 else "" for v in valores],
-                            textposition="inside",
-                            insidetextanchor="middle",
-                            textfont=dict(color="white", size=10),
-                            hovertemplate=(
-                                f"<b>{site}</b><br>"
-                                "Ciclo: %{x}<br>"
-                                f"Produto: {produto}<br>"
-                                "Volume: %{y:,.0f}<extra></extra>"
-                            )
-                        )
-                    )
-
-                fig.update_layout(
-                    title=dict(
-                        text=f"{site}",
-                        x=0.02,
-                        xanchor="left",
-                        font=dict(color="black", size=18)
-                    ),
-                    barmode="stack",
-                    height=300,
-                    margin=dict(l=20, r=20, t=45, b=30),
-                    xaxis=dict(
-                        title=dict(text="Nº CICLO", font=dict(color="black", size=12)),
-                        tickfont=dict(color="black", size=11),
-                        showgrid=False,
-                        tickangle=0
-                    ),
-                    yaxis=dict(
-                        title=dict(text="", font=dict(color="black", size=12)),
-                        tickfont=dict(color="black", size=11),
-                        showticklabels=False,
-                        showgrid=False,
-                        zeroline=False
-                    ),
-                    legend=dict(
-                        title=dict(text="Product DR", font=dict(color="black", size=11)),
-                        font=dict(color="black", size=10),
-                        orientation="h",
-                        yanchor="bottom",
-                        y=1.02,
-                        xanchor="right",
-                        x=1
-                    ),
-                    font=dict(color="black"),
-                    plot_bgcolor="white",
-                    paper_bgcolor="white"
-                )
-
-                st.plotly_chart(fig, use_container_width=True)
-
-
-# =========================
-# Download
-# =========================
-st.divider()
-st.subheader("Download da tabela")
-
-with st.popover("📥 Baixar dados"):
-    st.write("Escolha o formato:")
-
-    # Excel
-    excel_file = gerar_excel(tabela)
-    st.download_button(
-        label="📗 Excel",
-        data=excel_file,
-        file_name="visao_volumes.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        use_container_width=True
-    )
-
-    # PDF
-    st.download_button(
-        label="📕 PDF",
-        data=gerar_pdf(tabela),
-        file_name="visao_volumes.pdf",
-        mime="application/pdf",
-        use_container_width=True
-    )
-
-
-
-st.markdown(
-    """
-    <style>
-    :root {
-        --sidebar-width: 21rem;
-    }
-
-    .footer-bar {
-        position: fixed;
-        bottom: 0;
-        left: var(--sidebar-width);
-        width: calc(100% - var(--sidebar-width));
-        background-color: rgba(14, 17, 23, 0.95);
-        color: #ccc;
-        font-size: 0.75rem;
-        text-align: center;
-        padding: 8px 0;
-        z-index: 999;
-        border-top: 1px solid #333;
-        backdrop-filter: blur(4px);
-    }
-    </style>
-
-    <div class="footer-bar">
-        Aplicação desenvolvida para suporte às análises do time MPS • Versão 1.0 — Jeferson Santana / Copilot
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+    import streamlit.components.v1 as components
+    components.html(documento,height=1100,scrolling=True)
+st.caption("Downloads respeitam os filtros acima. A busca textual dentro do HTML é apenas visual.")
+c1,c2=st.columns(2)
+c1.download_button("Baixar Excel do recorte",excel(tabela,resumo),file_name=f"historico_volumes_{ano}.xlsx",mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+c2.download_button("Baixar painel HTML",documento,file_name=f"historico_volumes_{ano}.html",mime="text/html")
